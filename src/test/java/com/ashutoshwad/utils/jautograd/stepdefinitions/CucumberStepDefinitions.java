@@ -49,7 +49,10 @@ public class CucumberStepDefinitions {
 	public void the_result_should_be_with_deviation_allowed(Double result) {
 	    assertEquals(result, this.result.getValue(), deviation);
 	}
-
+	@Then("I must see the result equal to {double}")
+	public void i_must_see_the_result_equal_to(Double result) {
+		assertEquals(result, this.result.getValue(), deviation);
+	}
 	@Then("the gradient of x should be as calculated")
 	public void the_gradient_of_x_should_be() {
 		assertEquals(xGradient, x.getGradient(), deviation);
@@ -65,7 +68,7 @@ public class CucumberStepDefinitions {
 	    this.h = h;
 	}
 
-	/*-------------------Operators start here ---------------------------*/
+	/*------------------- Operators start here ---------------------------*/
 	@When("I perform operation ADDITION on x and y")
 	public void i_perform_operation_addition_on_x_and_y() {
 	    result = x.add(y);
@@ -149,5 +152,26 @@ public class CucumberStepDefinitions {
 	    nudgeF = Math.pow(xTemp, (yTemp + h));
 	    f = result.getValue();
 	    yGradient = (nudgeF - f) / h;
+	}
+	/*------------------- Functions start here ---------------------------*/
+	@When("I invoke the function RELU")
+	public void i_invoke_the_function_relu() {
+		result = x.relu();
+		result.backward();
+		if(x.getValue()>=0) {
+			xGradient = 1;
+		} else {
+			xGradient = 0;
+		}
+	}
+	@When("I invoke the function NEG_RELU_0_7")
+	public void i_invoke_the_function_neg_relu_0_7() {
+		result = x.relu(0.7);
+		result.backward();
+		if(x.getValue()>=0) {
+			xGradient = 1;
+		} else {
+			xGradient = 0.7;
+		}
 	}
 }
