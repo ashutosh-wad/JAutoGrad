@@ -2,6 +2,7 @@ package com.ashutoshwad.utils.jautograd;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -50,11 +51,13 @@ public class JAutogradValue implements Value {
 		this.left = (JAutogradValue) left;
 		this.right = (JAutogradValue) right;
 		this.type = type;
-		this.value = 0;
 		this.grad = 0;
 		this.gradCount = 0;
 		this.negSlope = negSlope;
 		this.values = null;
+		// The following calc value call is important as it correctly initializes the
+		// value for this node.
+		calcValue();
 	}
 
 	private void validateValue(Value val) {
@@ -71,6 +74,7 @@ public class JAutogradValue implements Value {
 		return id;
 	}
 
+	@Override
 	public double getValue() {
 		return value;
 	}
@@ -79,11 +83,12 @@ public class JAutogradValue implements Value {
 		this.value = value;
 	}
 
-	public double getGrad() {
+	@Override
+	public double getGradient() {
 		return grad;
 	}
 
-	public void setGrad(double grad) {
+	public void setGradient(double grad) {
 		this.grad = grad;
 	}
 
@@ -240,9 +245,9 @@ public class JAutogradValue implements Value {
 				right.accumulateGradient(grad * left.getValue());
 				break;
 			case POW:
-				left.accumulateGradient(grad * value * Math.log(left.getValue()));
 				temp = right.getValue();
-				right.accumulateGradient(grad * (temp * Math.pow(left.getValue(), temp - 1)));
+				left.accumulateGradient(grad * temp * Math.pow(left.getValue(), (temp-1)));
+				right.accumulateGradient(grad * value * Math.log(left.getValue()));
 				break;
 			case SIN:
 				left.accumulateGradient(grad * Math.cos(left.getValue()));
@@ -313,6 +318,7 @@ public class JAutogradValue implements Value {
 	@Override
 	public void backward() {
 		orderValues();
+		this.grad = 1;
 		for (int i = values.length - 1; i >= 0; i--) {
 			values[i].calcGradient();
 		}
@@ -343,6 +349,12 @@ public class JAutogradValue implements Value {
 		}
 		this.grad = 0;
 		this.gradCount = 0;
+	}
+
+	@Override
+	public String toString() {
+		DecimalFormat df = new DecimalFormat("#.##");
+		return df.format(value);
 	}
 
 	@Override

@@ -16,9 +16,11 @@ public interface Value {
 	public Value tan();
 	public Value sigmoid();
 	public Value exponential();
-	
-	
-	
+	public double getValue();
+	public double getGradient();
+
+
+
 	public void forward();
 	public void backward();
 	public void learn(double rate);
