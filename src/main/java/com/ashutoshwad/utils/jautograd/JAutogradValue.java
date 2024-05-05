@@ -272,8 +272,9 @@ public class JAutogradValue implements Value {
 				left.accumulateGradient(grad / temp);
 				break;
 			case RELU:
-				temp = (value < 0) ? negSlope : 1;
-				left.accumulateGradient(grad * temp);
+				temp = left.getValue();
+				temp = (temp == -0.0)?0.0: temp;
+				left.accumulateGradient(grad * ((temp >= 0) ? 1 : negSlope));
 				break;
 			case EXPONENTIAL:
 				left.accumulateGradient(grad * value);
