@@ -6,7 +6,57 @@
 	<artifactId>JAutoGrad</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.pitest</groupId>
+				<artifactId>pitest-parent</artifactId>
+				<version>1.1.10</version>
+				<type>pom</type>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	<dependencies>
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-java</artifactId>
+			<version>7.14.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.cucumber</groupId>
+			<artifactId>cucumber-junit</artifactId>
+			<version>7.14.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13.2</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.pitest</groupId>
+				<artifactId>pitest-maven</artifactId>
+				<configuration>
+					<targetClasses>
+						<param>com.ashutoshwad.utils.jautograd*</param>
+					</targetClasses>
+					<targetTests>
+						<param>com.ashutoshwad.utils.jautograd*</param>
+					</targetTests>
+					<excludedMethods>
+						<param>ExpressionUtils</param>
+					</excludedMethods>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
