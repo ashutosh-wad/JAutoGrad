@@ -7,8 +7,8 @@ import io.cucumber.junit.CucumberOptions;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
-		features = "src/test/resources/features/F202405051339.feature",
-		glue = "com.ashutoshwad.utils.jautograd.F202405051339",
+		features = "src/test/resources/features",
+		glue = "com.ashutoshwad.utils.jautograd.stepdefinitions",
 		plugin = {"pretty", "html:cucumber_report.html"},
 		dryRun = false
 		)

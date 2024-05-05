@@ -1,4 +1,4 @@
-package com.ashutoshwad.utils.jautograd.F202405051339;
+package com.ashutoshwad.utils.jautograd.stepdefinitions;
 
 import static org.junit.Assert.assertEquals;
 
@@ -10,7 +10,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-public class F202405051339_StepDefinitions {
+public class CucumberStepDefinitions {
 	private Value x;
 	private Value y;
 	private double deviation;
