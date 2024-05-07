@@ -24,7 +24,7 @@ public class JAutogradValue implements Value {
 	private final double negSlope;
 	private double value;
 	private double grad;
-	private double gradCount;
+	private int gradCount;
 	private JAutogradValue[] values;
 
 	public JAutogradValue() {
