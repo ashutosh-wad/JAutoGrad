@@ -282,13 +282,14 @@ public class JAutogradValue implements Value {
 	}
 
 	private void orderValues() {
-		if (null == this.values) {
-			List<JAutogradValue>tempList = orderValues(new HashSet<String>(), new LinkedList<JAutogradValue>());
-			this.values = new JAutogradValue[tempList.size()];
-			int i = 0;
-			for (JAutogradValue value : tempList) {
-				this.values[i++] = value;
-			}
+		if (null != this.values) {
+			return;
+		}
+		List<JAutogradValue>tempList = orderValues(new HashSet<String>(), new LinkedList<JAutogradValue>());
+		this.values = new JAutogradValue[tempList.size()];
+		int i = 0;
+		for (JAutogradValue value : tempList) {
+			this.values[i++] = value;
 		}
 	}
 
