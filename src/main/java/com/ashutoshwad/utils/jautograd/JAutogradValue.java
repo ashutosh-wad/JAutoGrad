@@ -329,7 +329,7 @@ public class JAutogradValue implements Value {
 	public void learn(double rate) {
 		orderValues();
 		for (int i = 0; i < values.length; i++) {
-			values[i].value = values[i].value - (rate * grad / gradCount);
+			values[i].value = values[i].value - ((rate * values[i].grad) / gradCount);
 		}
 	}
 
