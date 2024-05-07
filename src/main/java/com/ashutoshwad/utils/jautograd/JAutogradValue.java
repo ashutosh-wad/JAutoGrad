@@ -345,9 +345,6 @@ public class JAutogradValue implements Value {
 	}
 
 	private void resetState() {
-		if (ValueType.VALUE != type) {
-			value = 0;
-		}
 		this.grad = 0;
 		this.gradCount = 0;
 	}
