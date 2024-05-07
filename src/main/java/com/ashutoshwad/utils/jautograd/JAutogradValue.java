@@ -222,7 +222,6 @@ public class JAutogradValue implements Value {
 	}
 
 	private void calcGradient() {
-		gradCount++;
 		double temp;
 		switch (type) {
 			case VALUE:
@@ -318,6 +317,7 @@ public class JAutogradValue implements Value {
 
 	@Override
 	public void backward() {
+		gradCount++;
 		orderValues();
 		this.grad = 1;
 		for (int i = values.length - 1; i >= 0; i--) {
