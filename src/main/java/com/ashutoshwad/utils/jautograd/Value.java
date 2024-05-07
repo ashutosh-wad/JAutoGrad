@@ -17,6 +17,7 @@ public interface Value {
 	public Value sigmoid();
 	public Value exponential();
 	public double getValue();
+	public void setValue(double value);
 	public double getGradient();
 
 
