@@ -26,5 +26,5 @@ public interface Value {
 	public void backward();
 	public void learn(double rate);
 	public void reset();
-	public void createDotGraph();
+	public String createDotGraph();
 }

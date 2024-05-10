@@ -3,10 +3,12 @@ package com.ashutoshwad.utils.jautograd;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -368,65 +370,101 @@ public class JAutogradValue implements Value {
 	}
 
 	@Override
-	public void createDotGraph() {
+	public String createDotGraph() {
 		orderValues();
+		Map<String, String> idMap = new HashMap<>();
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		PrintWriter dot = new PrintWriter(baos);
 		dot.println("digraph Values {");
 		dot.println("\tnode [shape=record];");
 		for (int i = 0; i < values.length; i++) {
 			dot.println("\t" + values[i].createLabel(i));
+			idMap.put(values[i].id, values[i].createLabelName(i));
 		}
+		createDotMapping(idMap, dot, new HashSet<String>());
 		dot.println("}");
+		dot.close();
+		return new String(baos.toByteArray());
+	}
+	
+	private void createDotMapping(Map<String, String> idMap, PrintWriter dot, Set<String>visitedSet) {
+		if(visitedSet.contains(id)) {
+			return;
+		}
+		visitedSet.add(id);
+		if(null!=left) {
+			dot.println("\t" + idMap.get(left.id) + "->" + idMap.get(id));
+			left.createDotMapping(idMap, dot, visitedSet);
+		}
+		if(null!=right) {
+			dot.println("\t" + idMap.get(right.id) + "->" + idMap.get(id));
+			right.createDotMapping(idMap, dot, visitedSet);
+		}
+	}
+
+	private String createLabelName(int index) {
+		String labelName = "";
+		switch(type) {
+			case VALUE:
+				labelName = "v"+index;
+				break;
+			case LEARNABLE:
+				labelName = "l"+index;
+				break;
+			default:
+				labelName = "o"+index;
+		}
+		return labelName;
 	}
 
 	private String createLabel(int index) {
+		String labelName = createLabelName(index);
 		String label = "";
 		switch(type) {
 			case VALUE:
-				label = "v"+index+" [label=\"{v"+index+"|{<v>"+value+"|"+grad+"| "+(long)gradCount+"}}\"];";
+				label = labelName+" [label=\"{v"+index+"|{Value\\n"+value+"|Gradient\\n"+grad+"| "+(long)gradCount+"}}\"];";
 				break;
 			case LEARNABLE:
-				label = "l"+index+" [label=\"{l"+index+"|{<v>"+value+"|"+grad+"| "+(long)gradCount+"}}\"];";
+				label = labelName+" [label=\"{l"+index+"|{Value\\n"+value+"|Gradient\\n"+grad+"| "+(long)gradCount+"}}\"];";
 				break;
 			case ADD:
-				label = "o"+index+" [label=\"{<op>+|{"+value+"|"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>+|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
 				break;
 			case SUB:
-				label = "o"+index+" [label=\"{<op>-|{"+value+"|"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>-|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
 				break;
 			case DIV:
-				label = "o"+index+" [label=\"{<op>/|{"+value+"|"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>/|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
 				break;
 			case MUL:
-				label = "o"+index+" [label=\"{<op>*|{"+value+"|"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>*|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
 				break;
 			case POW:
-				label = "o"+index+" [label=\"{<op>^|{"+value+"|"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>^|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
 				break;
 			case SIN:
-				label = "o"+index+" [label=\"{<op>sin|{"+value+"|"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>sin|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
 				break;
 			case COS:
-				label = "o"+index+" [label=\"{<op>cos|{"+value+"|"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>cos|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
 				break;
 			case TAN:
-				label = "o"+index+" [label=\"{<op>tan|{"+value+"|"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>tan|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
 				break;
 			case SINH:
-				label = "o"+index+" [label=\"{<op>sinh|{"+value+"|"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>sinh|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
 				break;
 			case COSH:
-				label = "o"+index+" [label=\"{<op>cosh|{"+value+"|"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>cosh|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
 				break;
 			case TANH:
-				label = "o"+index+" [label=\"{<op>tanh|{"+value+"|"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>tanh|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
 				break;
 			case RELU:
-				label = "o"+index+" [label=\"{<op>relu|{"+value+"|"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>relu|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
 				break;
 			case EXPONENTIAL:
-				label = "o"+index+" [label=\"{<op>e^x|{"+value+"|"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>e^x|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
 				break;
 		}
 		return label;
