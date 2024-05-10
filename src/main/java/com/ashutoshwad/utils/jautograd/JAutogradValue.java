@@ -330,8 +330,19 @@ public class JAutogradValue implements Value {
 	public void learn(double rate) {
 		orderValues();
 		for (int i = 0; i < values.length; i++) {
-			values[i].value = values[i].value - ((rate * values[i].grad) / gradCount);
+			values[i].learnUsingGradient(rate, gradCount);
 		}
+	}
+
+	public void learnUsingGradient(double rate, int scale) {
+		if(type != ValueType.LEARNABLE) {
+			return;
+		}
+		double delta = grad;
+		delta = delta * rate;
+		delta = delta * -1;
+		delta = delta / scale;
+		this.value = this.value + delta;
 	}
 
 	@Override
