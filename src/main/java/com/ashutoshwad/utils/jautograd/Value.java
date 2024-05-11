@@ -6,6 +6,7 @@ public interface Value {
 	public Value div(Value other);
 	public Value mul(Value other);
 	public Value pow(Value other);
+	public Value sqrt();
 	public Value relu();
 	public Value relu(double negSlope);
 	public Value sinh();

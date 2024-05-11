@@ -120,6 +120,11 @@ public class JAutogradValue implements Value {
 	}
 
 	@Override
+	public Value sqrt() {
+		return pow(new JAutogradValue(0.5));
+	}
+
+	@Override
 	public Value relu() {
 		return relu(0);
 	}
