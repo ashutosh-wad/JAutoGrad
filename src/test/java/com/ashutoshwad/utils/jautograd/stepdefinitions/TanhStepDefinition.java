@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.ashutoshwad.utils.jautograd.JAutogradValue;
 import com.ashutoshwad.utils.jautograd.Value;
 
 import io.cucumber.java.en.Given;
@@ -21,10 +20,10 @@ public class TanhStepDefinition {
 	private List<Double>gradient;
 	@Given("I create a tanh implementation using JautoGradValue")
 	public void i_create_a_tanh_implementation_using_jauto_grad_value() {
-		x = new JAutogradValue(0);
-	    Value twoX = new JAutogradValue(2).mul(x);
+		x = Value.of(0);
+	    Value twoX = Value.of(2).mul(x);
 	    Value eToX = twoX.exponential();
-	    Value one = new JAutogradValue(1);
+	    Value one = Value.of(1);
 	    tanh = eToX.sub(one).div(eToX.add(one));
 	}
 	@When("I invoke the tanh function i created on a range of values between {double} and {double} with step {double}")

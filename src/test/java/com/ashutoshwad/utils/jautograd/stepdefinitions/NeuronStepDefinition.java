@@ -2,7 +2,6 @@ package com.ashutoshwad.utils.jautograd.stepdefinitions;
 
 import static org.junit.Assert.assertEquals;
 
-import com.ashutoshwad.utils.jautograd.JAutogradValue;
 import com.ashutoshwad.utils.jautograd.Value;
 
 import io.cucumber.java.en.Given;
@@ -20,13 +19,13 @@ public class NeuronStepDefinition {
 	private Value loss;
 	@Given("I create a neuron with inputs i1 & i2, bias b1 and output o1")
 	public void i_create_a_neuron_with_inputs_i1_i2_bias_b1_and_output_o1() {
-		i1 = new JAutogradValue(0.2);
-		i2 = new JAutogradValue(0.3);
-		w1 = new JAutogradValue(0.4);
-		w2 = new JAutogradValue(0.5);
-		b1 = new JAutogradValue(0.6);
+		i1 = Value.of(0.2);
+		i2 = Value.of(0.3);
+		w1 = Value.of(0.4);
+		w2 = Value.of(0.5);
+		b1 = Value.of(0.6);
 		o1 = i1.mul(w1).add(i2.mul(w2)).add(b1).tanh();
-		e1 = new JAutogradValue(0.1);
+		e1 = Value.of(0.1);
 	}
 	@Given("define loss l1 as \\(o1)^2")
 	public void define_loss_l1_as_o1() {
