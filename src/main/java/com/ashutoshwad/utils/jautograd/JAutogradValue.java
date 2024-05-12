@@ -289,6 +289,7 @@ public class JAutogradValue implements Value {
 				break;
 		}
 		gradient += tempGradient;
+		tempGradient = 0;
 		gradientCount++;
 	}
 
