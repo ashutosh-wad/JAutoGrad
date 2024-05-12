@@ -1,22 +1,25 @@
-package com.ashutoshwad.toynet;
+package com.ashutoshwad.utils.jautograd.toynet;
 
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 
-import com.ashutoshwad.utils.jautograd.JAutogradValue;
 import com.ashutoshwad.utils.jautograd.Value;
 
 public class ToyNetNeuron {
 	private Value[] weights;
 	private Value bias;
 	public ToyNetNeuron(int numInput) {
-		Random r = new Random();
 		this.weights = new Value[numInput];
 		for (int i = 0; i < weights.length; i++) {
-			this.weights[i] = new JAutogradValue(r.nextDouble(-1, 1), true);
+			this.weights[i] = Value.learnable(generateRandomWeight());
 		}
-		this.bias = new JAutogradValue(r.nextDouble(-1, 1), true);
+		this.bias = Value.learnable(generateRandomWeight());
+	}
+	private double generateRandomWeight() {
+		Random r = new Random();
+		double next = (r.nextDouble() * 2.0) - 1;
+		return next;
 	}
 	public Value connect(Value[]input) {
 		if(weights.length!=input.length) {

@@ -14,7 +14,7 @@ import java.util.UUID;
 
 import com.ashutoshwad.utils.jautograd.exception.JAutogradException;
 
-public class JAutogradValue implements Value {
+class JAutogradValue implements Value {
 	public static enum ValueType {
 		VALUE, LEARNABLE, ADD, SUB, DIV, MUL, POW, SIN, COS, TAN, SINH, COSH, TANH, RELU, EXPONENTIAL
 	}
@@ -25,8 +25,9 @@ public class JAutogradValue implements Value {
 	private final ValueType type;
 	private final double negSlope;
 	private double value;
-	private double grad;
-	private int gradCount;
+	private double tempGradient;
+	private double gradient;
+	private int gradientCount;
 	private JAutogradValue[] values;
 
 	public JAutogradValue() {
@@ -53,8 +54,9 @@ public class JAutogradValue implements Value {
 		this.left = (JAutogradValue) left;
 		this.right = (JAutogradValue) right;
 		this.type = type;
-		this.grad = 0;
-		this.gradCount = 0;
+		this.gradient = 0;
+		this.tempGradient = 0;
+		this.gradientCount = 0;
 		this.negSlope = negSlope;
 		this.values = null;
 		// The following calc value call is important as it correctly initializes the
@@ -87,11 +89,11 @@ public class JAutogradValue implements Value {
 
 	@Override
 	public double getGradient() {
-		return grad;
+		return gradient;
 	}
 
-	public void setGradient(double grad) {
-		this.grad = grad;
+	public void setGradient(double gradient) {
+		this.gradient = gradient;
 	}
 
 	@Override
@@ -224,8 +226,8 @@ public class JAutogradValue implements Value {
 		}
 	}
 
-	private void accumulateGradient(double grad) {
-		this.grad = this.grad + grad;
+	private void accumulateGradient(double gradient) {
+		this.tempGradient +=  gradient;
 	}
 
 	private void calcGradient() {
@@ -235,57 +237,60 @@ public class JAutogradValue implements Value {
 			case LEARNABLE:
 				break;
 			case ADD:
-				left.accumulateGradient(grad);
-				right.accumulateGradient(grad);
+				left.accumulateGradient(tempGradient);
+				right.accumulateGradient(tempGradient);
 				break;
 			case SUB:
-				left.accumulateGradient(grad);
-				right.accumulateGradient(-1 * grad);
+				left.accumulateGradient(tempGradient);
+				right.accumulateGradient(-1 * tempGradient);
 				break;
 			case DIV:
-				left.accumulateGradient(grad * (1 / right.getValue()));
-				right.accumulateGradient(grad * (left.getValue() * (-1 / (right.getValue() * right.getValue()))));
+				left.accumulateGradient(tempGradient * (1 / right.getValue()));
+				right.accumulateGradient(tempGradient * (left.getValue() * (-1 / (right.getValue() * right.getValue()))));
 				break;
 			case MUL:
-				left.accumulateGradient(grad * right.getValue());
-				right.accumulateGradient(grad * left.getValue());
+				left.accumulateGradient(tempGradient * right.getValue());
+				right.accumulateGradient(tempGradient * left.getValue());
 				break;
 			case POW:
 				temp = right.getValue();
-				left.accumulateGradient(grad * temp * Math.pow(left.getValue(), (temp-1)));
-				right.accumulateGradient(grad * value * Math.log(left.getValue()));
+				left.accumulateGradient(tempGradient * temp * Math.pow(left.getValue(), (temp-1)));
+				right.accumulateGradient(tempGradient * value * Math.log(left.getValue()));
 				break;
 			case SIN:
-				left.accumulateGradient(grad * Math.cos(left.getValue()));
+				left.accumulateGradient(tempGradient * Math.cos(left.getValue()));
 				break;
 			case COS:
-				left.accumulateGradient(grad * -1 * Math.sin(left.getValue()));
+				left.accumulateGradient(tempGradient * -1 * Math.sin(left.getValue()));
 				break;
 			case TAN:
 				temp = Math.cos(left.getValue());
 				temp = temp * temp;
-				left.accumulateGradient(grad / temp);
+				left.accumulateGradient(tempGradient / temp);
 				break;
 			case SINH:
-				left.accumulateGradient(grad * Math.cosh(left.getValue()));
+				left.accumulateGradient(tempGradient * Math.cosh(left.getValue()));
 				break;
 			case COSH:
-				left.accumulateGradient(grad * Math.sinh(left.getValue()));
+				left.accumulateGradient(tempGradient * Math.sinh(left.getValue()));
 				break;
 			case TANH:
 				temp = Math.cosh(left.getValue());
 				temp = temp * temp;
-				left.accumulateGradient(grad / temp);
+				left.accumulateGradient(tempGradient / temp);
 				break;
 			case RELU:
 				temp = left.getValue();
 				temp = (temp == -0.0)?0.0: temp;
-				left.accumulateGradient(grad * ((temp >= 0) ? 1 : negSlope));
+				left.accumulateGradient(tempGradient * ((temp >= 0) ? 1 : negSlope));
 				break;
 			case EXPONENTIAL:
-				left.accumulateGradient(grad * value);
+				left.accumulateGradient(tempGradient * value);
 				break;
 		}
+		gradient += tempGradient;
+		tempGradient = 0;
+		gradientCount++;
 	}
 
 	private void orderValues() {
@@ -325,9 +330,8 @@ public class JAutogradValue implements Value {
 
 	@Override
 	public void backward() {
-		gradCount++;
 		orderValues();
-		this.grad = 1;
+		this.tempGradient = 1;
 		for (int i = values.length - 1; i >= 0; i--) {
 			values[i].calcGradient();
 		}
@@ -337,18 +341,21 @@ public class JAutogradValue implements Value {
 	public void learn(double rate) {
 		orderValues();
 		for (int i = 0; i < values.length; i++) {
-			values[i].learnUsingGradient(rate, gradCount);
+			values[i].learnUsingGradient(rate);
 		}
 	}
 
-	public void learnUsingGradient(double rate, int scale) {
+	public void learnUsingGradient(double rate) {
 		if(type != ValueType.LEARNABLE) {
 			return;
 		}
-		double delta = grad;
+		if(0 == gradientCount) {
+			return;
+		}
+		double delta = gradient;
 		delta = delta * rate;
 		delta = delta * -1;
-		delta = delta / scale;
+		delta = delta / gradientCount;
 		this.value = this.value + delta;
 	}
 
@@ -364,8 +371,9 @@ public class JAutogradValue implements Value {
 	}
 
 	private void resetState() {
-		this.grad = 0;
-		this.gradCount = 0;
+		this.tempGradient = 0;
+		this.gradient = 0;
+		this.gradientCount = 0;
 	}
 
 	@Override
@@ -427,49 +435,49 @@ public class JAutogradValue implements Value {
 		String label = "";
 		switch(type) {
 			case VALUE:
-				label = labelName+" [label=\"{v"+index+"|{Value\\n"+value+"|Gradient\\n"+grad+"| "+(long)gradCount+"}}\"];";
+				label = labelName+" [label=\"{v"+index+"|{Value\\n"+value+"|Gradient\\n"+gradient+"| "+(long)gradientCount+"}}\"];";
 				break;
 			case LEARNABLE:
-				label = labelName+" [label=\"{l"+index+"|{Value\\n"+value+"|Gradient\\n"+grad+"| "+(long)gradCount+"}}\"];";
+				label = labelName+" [label=\"{l"+index+"|{Value\\n"+value+"|Gradient\\n"+gradient+"| "+(long)gradientCount+"}}\"];";
 				break;
 			case ADD:
-				label = labelName+" [label=\"{<op>+|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>+|{Value\\n"+value+"|Gradient\\n"+gradient+"|"+gradientCount+"}}\"];";
 				break;
 			case SUB:
-				label = labelName+" [label=\"{<op>-|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>-|{Value\\n"+value+"|Gradient\\n"+gradient+"|"+gradientCount+"}}\"];";
 				break;
 			case DIV:
-				label = labelName+" [label=\"{<op>/|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>/|{Value\\n"+value+"|Gradient\\n"+gradient+"|"+gradientCount+"}}\"];";
 				break;
 			case MUL:
-				label = labelName+" [label=\"{<op>*|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>*|{Value\\n"+value+"|Gradient\\n"+gradient+"|"+gradientCount+"}}\"];";
 				break;
 			case POW:
-				label = labelName+" [label=\"{<op>^|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>^|{Value\\n"+value+"|Gradient\\n"+gradient+"|"+gradientCount+"}}\"];";
 				break;
 			case SIN:
-				label = labelName+" [label=\"{<op>sin|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>sin|{Value\\n"+value+"|Gradient\\n"+gradient+"|"+gradientCount+"}}\"];";
 				break;
 			case COS:
-				label = labelName+" [label=\"{<op>cos|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>cos|{Value\\n"+value+"|Gradient\\n"+gradient+"|"+gradientCount+"}}\"];";
 				break;
 			case TAN:
-				label = labelName+" [label=\"{<op>tan|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>tan|{Value\\n"+value+"|Gradient\\n"+gradient+"|"+gradientCount+"}}\"];";
 				break;
 			case SINH:
-				label = labelName+" [label=\"{<op>sinh|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>sinh|{Value\\n"+value+"|Gradient\\n"+gradient+"|"+gradientCount+"}}\"];";
 				break;
 			case COSH:
-				label = labelName+" [label=\"{<op>cosh|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>cosh|{Value\\n"+value+"|Gradient\\n"+gradient+"|"+gradientCount+"}}\"];";
 				break;
 			case TANH:
-				label = labelName+" [label=\"{<op>tanh|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>tanh|{Value\\n"+value+"|Gradient\\n"+gradient+"|"+gradientCount+"}}\"];";
 				break;
 			case RELU:
-				label = labelName+" [label=\"{<op>relu|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>relu|{Value\\n"+value+"|Gradient\\n"+gradient+"|"+gradientCount+"}}\"];";
 				break;
 			case EXPONENTIAL:
-				label = labelName+" [label=\"{<op>e^x|{Value\\n"+value+"|Gradient\\n"+grad+"|"+gradCount+"}}\"];";
+				label = labelName+" [label=\"{<op>e^x|{Value\\n"+value+"|Gradient\\n"+gradient+"|"+gradientCount+"}}\"];";
 				break;
 		}
 		return label;

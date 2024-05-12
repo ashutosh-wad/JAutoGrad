@@ -28,4 +28,11 @@ public interface Value {
 	public void learn(double rate);
 	public void reset();
 	public String createDotGraph();
+
+	public static Value of(double value) {
+		return new JAutogradValue(value);
+	}
+	public static Value learnable(double value) {
+		return new JAutogradValue(value, true);
+	}
 }
