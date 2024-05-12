@@ -1,4 +1,4 @@
-package com.ashutoshwad.toynet;
+package com.ashutoshwad.utils.jautograd.toynet;
 
 import com.ashutoshwad.utils.jautograd.Value;
 

@@ -1,4 +1,4 @@
-package com.ashutoshwad.toynet;
+package com.ashutoshwad.utils.jautograd.toynet;
 
 import java.util.LinkedList;
 import java.util.Queue;
