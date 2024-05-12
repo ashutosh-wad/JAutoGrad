@@ -14,7 +14,7 @@ import java.util.UUID;
 
 import com.ashutoshwad.utils.jautograd.exception.JAutogradException;
 
-public class JAutogradValue implements Value {
+class JAutogradValue implements Value {
 	public static enum ValueType {
 		VALUE, LEARNABLE, ADD, SUB, DIV, MUL, POW, SIN, COS, TAN, SINH, COSH, TANH, RELU, EXPONENTIAL
 	}
