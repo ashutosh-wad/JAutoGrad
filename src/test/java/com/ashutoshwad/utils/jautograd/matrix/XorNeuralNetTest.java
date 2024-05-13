@@ -58,6 +58,7 @@ public class XorNeuralNetTest {
 			loss.reset();
 		}
 		System.out.println("X\tY\tOut\tAct\tLoss");
+		System.out.println("---------------------------------------");
 		forward(0, 0, 0, true);
 		forward(0, 1, 1, true);
 		forward(1, 0, 1, true);
@@ -84,9 +85,6 @@ public class XorNeuralNetTest {
 		System.out.print(df.format(output.getValue()) + "\t");
 		System.out.print(df.format(expected.getValue()) + "\t");
 		System.out.println(df.format(loss.getValue()) + "\t");
-		//MatrixUtils.print(input);System.out.println();
-		//System.out.println(output.getValue());
-		System.out.println("------------------------------------------------------------------------");
 	}
 
 	public static final void assertWorking(double i1, double i2, double expectedValue) {
