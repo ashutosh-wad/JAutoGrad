@@ -6,6 +6,7 @@ public interface Value {
 	public Value div(Value other);
 	public Value mul(Value other);
 	public Value pow(Value other);
+	public Value sqrt();
 	public Value relu();
 	public Value relu(double negSlope);
 	public Value sinh();
@@ -17,6 +18,7 @@ public interface Value {
 	public Value sigmoid();
 	public Value exponential();
 	public double getValue();
+	public void setValue(double value);
 	public double getGradient();
 
 
@@ -25,5 +27,12 @@ public interface Value {
 	public void backward();
 	public void learn(double rate);
 	public void reset();
-	public void createDotGraph();
+	public String createDotGraph();
+
+	public static Value of(double value) {
+		return new JAutogradValue(value);
+	}
+	public static Value learnable(double value) {
+		return new JAutogradValue(value, true);
+	}
 }

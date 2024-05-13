@@ -2,16 +2,15 @@ package com.ashutoshwad.utils.jautograd.stepdefinitions;
 
 import static org.junit.Assert.assertEquals;
 
-import com.ashutoshwad.utils.jautograd.JAutogradValue;
+import java.util.LinkedList;
+import java.util.List;
+
 import com.ashutoshwad.utils.jautograd.Value;
 
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class CucumberStepDefinitions {
 	private Value x;
@@ -40,12 +39,12 @@ public class CucumberStepDefinitions {
 
 	@Given("I initialize variable x to value {double}")
 	public void i_initialize_variable_x_to_value(Double x) {
-	    this.x = new JAutogradValue(x);
+	    this.x = Value.of(x);
 	}
 
 	@Given("I initialize y to value {double}")
 	public void i_initialize_y_to_value(Double y) {
-		this.y = new JAutogradValue(y);
+		this.y = Value.of(y);
 	}
 
 	@Given("allowed deviation is {double}")
@@ -187,7 +186,7 @@ public class CucumberStepDefinitions {
 	public void i_initialize_variable_x_array_to_a_range_of_values_between_and_with_a_step_size_of(double start, double end, double step) {
 		List<Value> values = new LinkedList<>();
 		for (double i = start; i <= end; i+=step) {
-			values.add(new JAutogradValue(i));
+			values.add(Value.of(i));
 		}
 
 		x_array = new Value[values.size()];
