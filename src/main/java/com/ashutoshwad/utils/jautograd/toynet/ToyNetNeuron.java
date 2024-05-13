@@ -12,9 +12,9 @@ public class ToyNetNeuron {
 	public ToyNetNeuron(int numInput) {
 		this.weights = new Value[numInput];
 		for (int i = 0; i < weights.length; i++) {
-			this.weights[i] = Value.learnable(generateRandomWeight());
+			this.weights[i] = Value.learnable(generateRandomWeight()/numInput);
 		}
-		this.bias = Value.learnable(generateRandomWeight());
+		this.bias = Value.learnable(generateRandomWeight()/numInput);
 	}
 	private double generateRandomWeight() {
 		Random r = new Random();
