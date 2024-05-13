@@ -24,7 +24,9 @@ Now you just need to include the dependency of this project in your own work.
 
 # Usage
 
-Below is a code snippet implementing a simple network with 2 inputs 3 hidden layers and 1 output which learns the XOR function.
+## Using the ToyNetwork
+Below is a code snippet implementing a simple network with 2 inputs 3 hidden layers and 1 output which learns the XOR function. It is less customizable than the matrix method, but is also much easier to implement.
+
 ```Java
 import java.text.DecimalFormat;
 
@@ -96,4 +98,30 @@ public class Test {
 		loss.reset();
 	}
 }
+```
+
+## Using matrix operations
+
+The network creation is shown in the below snippet, training and using the network is as shown in the ToyNetwork example.
+The matrix method gives a more fine gained control over the network with the added benifit of being able to serialize and persist the weights of the network as you like.
+
+### Create the network
+```java
+Random r = new Random();
+input = MatrixUtils.createMatrix(1, 2);
+Value[][]layer1 = MatrixUtils.createMatrix(2, 3, ()->r.nextDouble()*2-1);
+Value[][]layer2 = MatrixUtils.createMatrix(3, 1, ()->r.nextDouble()*2-1);
+
+Value[][]intermidiate = MatrixUtils.mul(input, layer1);
+MatrixUtils.op(intermidiate, v -> v.add(Value.learnable(r.nextDouble()*2-1)));
+MatrixUtils.op(intermidiate, v -> v.tanh());
+		
+intermidiate = MatrixUtils.mul(intermidiate, layer2);
+MatrixUtils.op(intermidiate, v -> v.add(Value.learnable(r.nextDouble()*2-1)));
+MatrixUtils.op(intermidiate, v -> v.tanh());
+		
+output = intermidiate[0][0];
+expected = Value.of(0);
+loss = output.sub(expected);
+loss = loss.mul(loss);
 ```
