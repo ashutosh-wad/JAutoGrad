@@ -44,3 +44,12 @@ Feature: Functions supported by JAutogradValue should work as expected.
     When I invoke the function TAN on x_array
     Then I must see the result equal to the expected result for TAN
     And the gradient of x_array should be as calculated for TAN
+
+# Logarithm of a negative number does not exist
+  Scenario: JAutogradValue must support exponential functions for calculations.
+    Given I initialize variable x_array to a range of values between 0 and 2 with a step size of 0.01
+    And allowed deviation is 0.0001
+    And h is 0.00000001
+    When I invoke the function NATURAL_LOG on x_array
+    Then I must see the result equal to the expected result for NATURAL_LOG
+    And the gradient of x_array should be as calculated
