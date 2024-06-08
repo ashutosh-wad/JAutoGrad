@@ -16,7 +16,7 @@ import com.ashutoshwad.utils.jautograd.exception.JAutogradException;
 
 class JAutogradValue implements Value {
 	public static enum ValueType {
-		VALUE, LEARNABLE, ADD, SUB, DIV, MUL, POW, SIN, COS, TAN, SINH, COSH, TANH, RELU, EXPONENTIAL
+		VALUE, LEARNABLE, ADD, SUB, DIV, MUL, POW, SIN, COS, TAN, SINH, COSH, TANH, RELU, EXPONENTIAL, NATURAL_LOG
 	}
 
 	private final String id;
@@ -179,6 +179,11 @@ class JAutogradValue implements Value {
 		return new JAutogradValue(this, null, ValueType.EXPONENTIAL);
 	}
 
+	@Override
+	public Value ln() {
+		return new JAutogradValue(this, null, ValueType.NATURAL_LOG);
+	}
+
 	private void calcValue() {
 		switch (type) {
 			case VALUE:
@@ -222,6 +227,9 @@ class JAutogradValue implements Value {
 				break;
 			case EXPONENTIAL:
 				value = Math.exp(left.getValue());
+				break;
+			case NATURAL_LOG:
+				value = Math.log(left.getValue());
 				break;
 		}
 	}
@@ -286,6 +294,9 @@ class JAutogradValue implements Value {
 				break;
 			case EXPONENTIAL:
 				left.accumulateGradient(tempGradient * value);
+				break;
+			case NATURAL_LOG:
+				left.accumulateGradient(tempGradient * (1/left.getValue()));
 				break;
 		}
 		gradient += tempGradient;

@@ -17,11 +17,11 @@ public interface Value {
 	public Value tan();
 	public Value sigmoid();
 	public Value exponential();
+	public Value ln();
+
 	public double getValue();
 	public void setValue(double value);
 	public double getGradient();
-
-
 
 	public void forward();
 	public void backward();
