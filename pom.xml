@@ -8,5 +8,6 @@
   <name>JAutoGrad</name>
   <modules>
     <module>jautograd-core</module>
+    <module>jautograd-test</module>
   </modules>
 </project>
