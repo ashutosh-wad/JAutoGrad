@@ -17,8 +17,8 @@ Now you just need to include the dependency of this project in your own work.
 ```xml
 <dependency>
     <groupId>com.ashutoshwad.utils.jautograd</groupId>
-    <artifactId>JAutoGrad</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <artifactId>jautograd-core</artifactId>
+    <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
 

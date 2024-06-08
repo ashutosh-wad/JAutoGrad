@@ -349,6 +349,31 @@ public class CucumberStepDefinitions {
 			assertEquals(Math.exp(x_array[i].getValue()), x_array_result[i].getValue(), deviation);
 		}
 	}
+
+	@When("I invoke the function NATURAL_LOG on x_array")
+	public void i_invoke_the_function_natural_log_on_x_array() {
+		x_array_result = new Value[x_array.length];
+		x_array_gradient = new double[x_array.length];
+		for (int i = 0; i < x_array.length; i++) {
+			x_array_result[i] = x_array[i].ln();
+			x_array_result[i].backward();
+
+
+			double xTemp = x_array[i].getValue();
+			//Calculate gradient for x
+			double nudgeF = Math.log(xTemp + h);
+			double f = Math.log(xTemp);
+			x_array_gradient[i] = (nudgeF - f) / h;
+		}
+	}
+
+	@Then("I must see the result equal to the expected result for NATURAL_LOG")
+	public void i_must_see_the_result_equal_to_the_expected_result_for_natural_log() {
+		for (int i = 0; i < x_array_result.length; i++) {
+			assertEquals(Math.log(x_array[i].getValue()), x_array_result[i].getValue(), deviation);
+		}
+	}
+
 	@When("I invoke the function SIGMOID on x_array")
 	public void i_invoke_the_function_sigmoid_on_x_array() {
 		x_array_result = new Value[x_array.length];
@@ -380,6 +405,7 @@ public class CucumberStepDefinitions {
 	@Then("the gradient of x_array should be as calculated")
 	public void the_gradient_of_x_array_should_be_as_calculated() {
 		for (int i = 0; i < x_array_gradient.length; i++) {
+			System.out.println(x_array_gradient[i]+":"+x_array[i].getGradient()+":"+x_array[i].getValue());
 			assertEquals(x_array_gradient[i], x_array[i].getGradient(), deviation);
 		}
 	}

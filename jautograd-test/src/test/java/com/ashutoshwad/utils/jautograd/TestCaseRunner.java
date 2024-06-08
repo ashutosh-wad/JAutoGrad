@@ -9,7 +9,7 @@ import io.cucumber.junit.CucumberOptions;
 @CucumberOptions(
 		features = "src/test/resources/features",
 		glue = "com.ashutoshwad.utils.jautograd.stepdefinitions",
-		plugin = {"pretty", "html:cucumber_report.html"},
+		plugin = {"html:cucumber_report.html"},
 		dryRun = false
 		)
 public class TestCaseRunner {

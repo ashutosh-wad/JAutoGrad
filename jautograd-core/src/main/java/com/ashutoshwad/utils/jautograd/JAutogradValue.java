@@ -296,7 +296,7 @@ class JAutogradValue implements Value {
 				left.accumulateGradient(tempGradient * value);
 				break;
 			case NATURAL_LOG:
-				left.accumulateGradient(tempGradient * (1 / left.getValue()));
+				left.accumulateGradient(tempGradient * (1/left.getValue()));
 				break;
 		}
 		gradient += tempGradient;
