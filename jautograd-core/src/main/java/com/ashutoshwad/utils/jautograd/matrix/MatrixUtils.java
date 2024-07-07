@@ -1,11 +1,13 @@
 package com.ashutoshwad.utils.jautograd.matrix;
 
+import java.util.function.BiFunction;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
 
 import com.ashutoshwad.utils.jautograd.Value;
 
 public class MatrixUtils {
+
 	/**
 	 * This function multiplies the matrices given in the input and returns the
 	 * result.
@@ -32,6 +34,35 @@ public class MatrixUtils {
 					sum = sum.add(a[i][k].mul(b[k][j]));
 				}
 				result[i][j] = sum;
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Perform the supplied operation on each element in the input matrix a and
+	 * input matrix b and then return the result.
+	 * 
+	 * @param a         The first matrix
+	 * @param b         The second matrix
+	 * @param operation The elementwise operation to be performed
+	 * @return The result matrix after the elementwise operation
+	 */
+	public static Value[][] op(Value[][] a, Value[][] b, BiFunction<Value, Value, Value>operation) {
+		int rowsA = a.length;
+		int colsA = a[0].length;
+		int rowsB = b.length;
+		int colsB = b[0].length;
+
+		if (rowsA != rowsB || colsA!=colsB)
+			throw new RuntimeException("Matrix dimensions don't match!");
+
+		Value[][] result = new Value[rowsA][colsA];
+
+		for (int i = 0; i < rowsA; i++) {
+			for (int j = 0; j < colsA; j++) {
+				result[i][j] = operation.apply(a[i][j], b[i][j]);
 			}
 		}
 
@@ -107,6 +138,7 @@ public class MatrixUtils {
 
 	/**
 	 * This method prints out the matrix, it is useful when debugging issues.
+	 * 
 	 * @param output the matrix to print
 	 */
 	public static void print(Value[][] output) {
@@ -116,5 +148,28 @@ public class MatrixUtils {
 			}
 			System.out.println();
 		}
+	}
+
+	/**
+	 * This method performs a softmax over the input matrix ensuring all values sum
+	 * to one and can be considered as probabilities.
+	 * 
+	 * @param output The matrix to softmax
+	 * @return A matrix of the same dimensions as the input but all values softmaxed.
+	 */
+	public static Value[][] softmax(Value[][] output) {
+		Value sum = Value.of(0);
+		for (int i = 0; i < output.length; i++) {
+			for (int j = 0; j < output[i].length; j++) {
+				output[i][j] = output[i][j].exponential();
+				sum = sum.add(output[i][j]);
+			}
+		}
+		for (int i = 0; i < output.length; i++) {
+			for (int j = 0; j < output[i].length; j++) {
+				output[i][j] = output[i][j].div(sum);
+			}
+		}
+		return output;
 	}
 }
