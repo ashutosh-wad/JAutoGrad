@@ -1,8 +1,12 @@
 package com.ashutoshwad.utils.jautograd.tokenizer.bytepairencoding;
 
-public class Token {
+import java.io.*;
+
+public class Token implements Serializable {
     private long id;
     private String token;
+
+    public Token() {}
 
     public Token(long id, String token) {
         this.id = id;
@@ -34,4 +38,27 @@ public class Token {
                 .replace("\t", "\\t")
                 .replace("\"", "\\\"");
     }
+
+    /*
+    @Override
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeLong(id);
+        boolean isTokenNull = null == token;
+        out.writeBoolean(isTokenNull);
+        if(!isTokenNull) {
+            out.writeUTF(token);
+        }
+    }
+
+    @Override
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        id = in.readLong();
+        boolean isTokenNull = in.readBoolean();
+        if(isTokenNull) {
+            token = null;
+        } else {
+            token = in.readUTF();
+        }
+    }
+    */
 }

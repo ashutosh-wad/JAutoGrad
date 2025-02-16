@@ -14,39 +14,29 @@ public class BytePairEncoder {
 
     public static void buildEncoding(File input, final long maxTokens) {
         String corpus = readFileIntoString(input);
-        List<Token> tokens = extractBaseTokens(corpus);
+        BytePairTokenizer tokenizer = new BytePairTokenizer();
+        tokenizer.loadFromFile();
+        tokenizer.initializeFromText(corpus);
 
-        Map<Long, Token>tokenLookupMap = new HashMap<>();
-        Map<String, Token>idLookupMap = new HashMap<>();
-        buildLookupMaps(tokens, tokenLookupMap, idLookupMap);
+        List<Token>corpusAsTokens = tokenizer.tokenize(corpus);
 
-        List<Token>corpusAsTokens = new LinkedList<>();
-        for (int i = 0; i < corpus.length(); i++) {
-            corpusAsTokens.add(idLookupMap.get(Character.toString(corpus.charAt(i))));
-        }
-        long idProvider = tokens.get(tokens.size() - 1).getId() + 1;
-
-        while(tokens.size() < maxTokens && corpusAsTokens.size()>1) {
+        while(tokenizer.size() < maxTokens && corpusAsTokens.size()>1) {
             TokenPair mostCommonPair = findMaxFrequencyPair(corpusAsTokens);
-            Token newToken = new Token(idProvider++, mostCommonPair.getOne().getToken() + mostCommonPair.getTwo().getToken());
-            tokens.add(newToken);
-            corpusAsTokens = replaceInCorpus(mostCommonPair, newToken, corpusAsTokens);
-            printByProbability(0.1, tokens);
+            tokenizer.createNewToken(mostCommonPair.getOne().getToken() + mostCommonPair.getTwo().getToken());
+            corpusAsTokens = tokenizer.tokenize(corpus);
+
+            saveByProbability(0.1, tokenizer);
         }
-        for(Token token:tokens) {
-            System.out.println(token.getId() + ": \"" + token + "\"");
-        }
+        tokenizer.saveToFile();
     }
 
-    public static void printByProbability(double probability, List<Token> tokens) {
+    public static void saveByProbability(double probability, BytePairTokenizer tokenizer) {
         // Ensure probability is within [0, 1] range
         double finalProbability = Math.max(0.0, Math.min(1.0, probability));
         Random r = new Random();
 
         if (r.nextDouble() < finalProbability) {
-            for(Token token:tokens) {
-                System.out.println(token.getId() + ": \"" + token.getToken() + "\"");
-            }
+            tokenizer.saveToFile();
         }
     }
 
@@ -56,9 +46,6 @@ public class BytePairEncoder {
         Token old = null;
         for(Token token:corpusAsTokens) {
             if(MATCH) {
-                if(null == old || null == mergedToken || null == token) {
-                    System.out.println("asd");
-                }
                 if(token.getId() == mostCommonPair.getTwo().getId()) {
                     MATCH=false;
                     newCorpus.add(mergedToken);
@@ -171,7 +158,7 @@ public class BytePairEncoder {
         try {
             Scanner scn = new Scanner(new BufferedInputStream(new FileInputStream(input)));
             while(scn.hasNextLine()) {
-                sb.append(preProcessInput(scn.nextLine()));
+                sb.append(scn.nextLine());
                 sb.append("\n");
             }
         } catch (FileNotFoundException e) {
@@ -180,6 +167,7 @@ public class BytePairEncoder {
         return sb.toString();
     }
 
+    /*
     private static String preProcessInput(String str) {
         //Remove any occurance of multiple spaces
         while(str.contains("  ")) {
@@ -187,4 +175,5 @@ public class BytePairEncoder {
         }
         return str;
     }
+    */
 }
