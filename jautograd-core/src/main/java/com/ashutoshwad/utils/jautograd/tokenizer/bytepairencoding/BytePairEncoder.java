@@ -109,17 +109,18 @@ public class BytePairEncoder {
         Map<TokenPair, Long>frequencyTrackingMap = new HashMap<>();
         Token old = null;
         long start = System.currentTimeMillis();
-        System.out.println("Start loop for calculating max frequency pair");
         for (Token token : corpusAsTokens) {
             if(null == old) {
                 old = token;
             } else {
                 TokenPair tokenPair = new TokenPair(old, token);
-                if(!frequencyTrackingMap.containsKey(tokenPair)) {
-                    frequencyTrackingMap.put(tokenPair, 1l);
-                } else {
-                    frequencyTrackingMap.put(tokenPair, frequencyTrackingMap.get(tokenPair)+1);
-                }
+                frequencyTrackingMap.compute(tokenPair, (k, v)->{
+                    if(null==v) {
+                        return 1L;
+                    } else {
+                        return v + 1;
+                    }
+                });
                 old = token;
             }
         }
