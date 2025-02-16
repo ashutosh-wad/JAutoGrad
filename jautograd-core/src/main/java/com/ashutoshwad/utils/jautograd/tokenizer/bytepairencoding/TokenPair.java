@@ -2,7 +2,7 @@ package com.ashutoshwad.utils.jautograd.tokenizer.bytepairencoding;
 
 import java.util.Objects;
 
-public class TokenPair {
+public class TokenPair implements Comparable<TokenPair> {
     private final Token one;
     private final Token two;
 
@@ -40,5 +40,18 @@ public class TokenPair {
     @Override
     public String toString() {
         return one.toString() + "|" + two.toString();
+    }
+
+    @Override
+    public int compareTo(TokenPair o) {
+        if(null==o) {
+            //Anything is greater than null
+            return 1;
+        }
+        int retVal = Long.compare(one.getId(), o.one.getId());
+        if(0==retVal) {
+            retVal = Long.compare(two.getId(), o.two.getId());
+        }
+        return retVal;
     }
 }
