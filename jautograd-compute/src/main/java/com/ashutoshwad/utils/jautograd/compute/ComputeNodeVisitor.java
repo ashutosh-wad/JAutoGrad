@@ -2,12 +2,11 @@ package com.ashutoshwad.utils.jautograd.compute;
 
 import java.util.*;
 
-public class ComputeNodeVisitor {
+class ComputeNodeVisitor {
     private Queue<ComputeNode> visitQueue;
     private Map<Long, Set<Long>> dependencyMap;
     private Map<Long, Set<Long>> reverseDependencyMap;
     private Map<Long, ComputeNode> nodeMap;
-    private List<ComputeNode[]> batches;
 
     public ComputeNodeVisitor() {
         init();
@@ -18,7 +17,6 @@ public class ComputeNodeVisitor {
         this.dependencyMap = new HashMap<>();
         this.reverseDependencyMap = new HashMap<>();
         this.nodeMap = new HashMap<>();
-        this.batches = new LinkedList<>();
     }
 
     private void addDependency(long source, long target) {
@@ -70,41 +68,17 @@ public class ComputeNodeVisitor {
         visitQueuedNodes();
     }
 
-    public void prepareBatches() {
+    public List<ComputeNode[]> prepareBatches() {
+        List<ComputeNode[]> batches = new LinkedList<>();
         while (!nodeMap.isEmpty()) {
             ComputeNode[] batch = prepareBatch();
             batches.add(batch);
         }
+        return batches;
     }
 
-    public ComputeNode[] prepareBatch() {
+    private ComputeNode[] prepareBatch() {
         List<ComputeNode> batch = new LinkedList<>();
-        /*
-        for (Map.Entry<Long, ComputeNode> entry:nodeMap.entrySet()) {
-            if (!dependencyMap.containsKey(entry.getKey())) {
-                batch.add(entry.getValue());
-            }
-        }
-        for (Iterator<Map.Entry<Long, ComputeNode>> it = nodeMap.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry<Long, ComputeNode> entry = it.next();
-            Long key = entry.getKey();
-            ComputeNode node = entry.getValue();
-
-            if (!dependencyMap.containsKey(key)) {
-                it.remove();
-                if (reverseDependencyMap.containsKey(key)) {
-                    for (long depKey : reverseDependencyMap.get(key)) {
-                        Set<Long> dependencySet = dependencyMap.get(depKey);
-                        dependencySet.remove(key);
-                        if (dependencySet.isEmpty()) {
-                            dependencyMap.remove(depKey);
-                        }
-                    }
-                    reverseDependencyMap.remove(key);
-                }
-            }
-        }
-        */
         for (Iterator<Map.Entry<Long, ComputeNode>> it = nodeMap.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<Long, ComputeNode> entry = it.next();
             Long key = entry.getKey();

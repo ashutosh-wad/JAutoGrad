@@ -2,7 +2,7 @@
 
 A lot has been acomplished, let me list out a checklist of pending tasks.
 
-- [ ] Create a parallel executor that can execute the compute graph forward and backward in a parallel wat
+- [X] Create a parallel executor that can execute the compute graph forward and backward in a parallel way
 - [ ] Reorganize and design code from the perspective of the end user
 - [ ] Complete all javadocs and create documentation on how to use this repository
 - [ ] Implement logging with slf4j and logback (perhaps logback is not needed, depends on analysis)

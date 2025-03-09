@@ -56,6 +56,7 @@ public class ComputeNode {
         this.gradient = gradient;
     }
 
+    /*
     protected boolean isUnaryOperator() {
         return left != null && right == null;
     }
@@ -63,6 +64,7 @@ public class ComputeNode {
     protected boolean isBinaryOperator() {
         return left != null && right != null;
     }
+    */
 
     protected void addDependency(ComputeNode dependency, boolean isLeft) {
         if (null == dependencies) {
@@ -89,7 +91,7 @@ public class ComputeNode {
         calcFunction.apply(left, right, this);
     }
 
-    protected double computePartialGradient(boolean isInvokerLeft) {
+    private double computePartialGradient(boolean isInvokerLeft) {
         return gradientFunction.apply(this, left, right, isInvokerLeft);
     }
 
@@ -105,8 +107,22 @@ public class ComputeNode {
         }
     }
 
-    public void visit(ComputeNodeVisitor visitor) {
+    protected void visit(ComputeNodeVisitor visitor) {
         visitor.visit(this, left, right, dependencies);
+    }
+
+    public JAutogradExecutor createExecutor() {
+        ComputeNodeVisitor visitor = new ComputeNodeVisitor();
+        visitor.visit(this, left, right, dependencies);
+        JAutogradExecutor executor = new JAutogradExecutor(visitor.prepareBatches());
+        return executor;
+    }
+
+    public JAutogradExecutor createExecutor(int numThreads) {
+        ComputeNodeVisitor visitor = new ComputeNodeVisitor();
+        visitor.visit(this, left, right, dependencies);
+        JAutogradExecutor executor = new JAutogradExecutor(numThreads, visitor.prepareBatches());
+        return executor;
     }
 
     public ComputeNode add(ComputeNode o) {
