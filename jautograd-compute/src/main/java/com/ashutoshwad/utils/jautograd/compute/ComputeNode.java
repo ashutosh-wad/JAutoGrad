@@ -21,7 +21,7 @@ public class ComputeNode {
         calc();
     }
 
-    protected ComputeNode(ComputeNode left, ComputeNode right, ComputeFunction calcFunction, GradientFunction gradientFunction) {
+    private ComputeNode(ComputeNode left, ComputeNode right, ComputeFunction calcFunction, GradientFunction gradientFunction) {
         this.id = generator.getAndIncrement();
         this.left = left;
         this.right = right;
@@ -56,16 +56,6 @@ public class ComputeNode {
         this.gradient = gradient;
     }
 
-    /*
-    protected boolean isUnaryOperator() {
-        return left != null && right == null;
-    }
-
-    protected boolean isBinaryOperator() {
-        return left != null && right != null;
-    }
-    */
-
     protected void addDependency(ComputeNode dependency, boolean isLeft) {
         if (null == dependencies) {
             dependencies = new ComputeNode[1];
@@ -87,7 +77,7 @@ public class ComputeNode {
         }
     }
 
-    public void calc() {
+    protected void calc() {
         calcFunction.apply(left, right, this);
     }
 
@@ -95,7 +85,7 @@ public class ComputeNode {
         return gradientFunction.apply(this, left, right, isInvokerLeft);
     }
 
-    public void computeGradient() {
+    protected void computeGradient() {
         if (null == dependencies || dependencies.length == 0) {
             //This indicates that this is an output node, so gradient will be 1
             gradient = 1;
