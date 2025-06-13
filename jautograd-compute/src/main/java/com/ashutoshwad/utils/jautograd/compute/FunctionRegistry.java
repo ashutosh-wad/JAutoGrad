@@ -16,7 +16,7 @@ class FunctionRegistry {
     public static final ComputeFunction SINH = (l, r, t) -> t.setValue(Math.sinh(l.getValue()));
     public static final ComputeFunction COSH = (l, r, t) -> t.setValue(Math.cosh(l.getValue()));
     public static final ComputeFunction TANH = (l, r, t) -> t.setValue(Math.tanh(l.getValue()));
-    public static final ComputeFunction RELU = (l, r, t) -> t.setValue((l.getValue() >= 0) ? r.getValue() : 0);
+    public static final ComputeFunction RELU = (l, r, t) -> t.setValue((l.getValue() >= 0) ? l.getValue() : 0);
     public static final ComputeFunction LEAKY_RELU = (l, r, t) -> t.setValue((l.getValue() >= 0) ? l.getValue() : 0.1 * l.getValue());
     public static final ComputeFunction EXP = (l, r, t) -> t.setValue(Math.exp(l.getValue()));
     public static final ComputeFunction LN = (l, r, t) -> t.setValue(Math.log(l.getValue()));
