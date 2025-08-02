@@ -8,6 +8,7 @@ class FunctionRegistry {
     public static final ComputeFunction DIV = (l, r, t) -> t.setValue(l.getValue() / r.getValue());
     public static final ComputeFunction MUL = (l, r, t) -> t.setValue(l.getValue() * r.getValue());
     public static final ComputeFunction POW = (l, r, t) -> t.setValue(Math.pow(l.getValue(), r.getValue()));
+    public static final ComputeFunction SQRT = (l, r, t) -> t.setValue(Math.sqrt(l.getValue()));
     public static final ComputeFunction MAX = (l, r, t) -> t.setValue((Math.max(l.getValue(), r.getValue())));
     public static final ComputeFunction MIN = (l, r, t) -> t.setValue((Math.min(l.getValue(), r.getValue())));
     public static final ComputeFunction SIN = (l, r, t) -> t.setValue(Math.sin(l.getValue()));
@@ -21,6 +22,11 @@ class FunctionRegistry {
     public static final ComputeFunction EXP = (l, r, t) -> t.setValue(Math.exp(l.getValue()));
     public static final ComputeFunction LN = (l, r, t) -> t.setValue(Math.log(l.getValue()));
     public static final ComputeFunction LOG = (l, r, t) -> t.setValue(Math.log10(l.getValue()));
+    public static final ComputeFunction SIGMOID = (l, r, t) -> {
+        double x = l.getValue();
+        double sigmoid = 1 / ( 1 + Math.exp(-1 * x) );
+        t.setValue(sigmoid);
+    };
     public static final ComputeFunction SIMPLE_SWISH = (l, r, t) -> {
         double x = l.getValue();
         double result = x / (1 + Math.exp(-1 * x));
@@ -42,6 +48,11 @@ class FunctionRegistry {
     };
     public static final GradientFunction POW_GRAD = (o, l, r, isInvokerLeft) -> {
         return isInvokerLeft ? o.getGradient() * r.getValue() * Math.pow(l.getValue(), (r.getValue() - 1)) : o.getGradient() * o.getValue() * Math.log(l.getValue());
+    };
+    public static final GradientFunction SQRT_GRAD = (o, l, r, isInvokerLeft) -> {
+        double sqrt_x = o.getValue();
+        double derivative = 1.0 / (2.0 * sqrt_x);
+        return o.getGradient() * derivative;
     };
     public static final GradientFunction MAX_GRAD = (o, l, r, isInvokerLeft) -> {
         double diff = Math.abs(l.getValue() - r.getValue());
@@ -106,6 +117,11 @@ class FunctionRegistry {
     private static final double LN10 = Math.log(10);
     public static final GradientFunction LOG_GRAD = (o, l, r, isInvokerLeft) -> {
         return o.getGradient() * (1 / (LN10 * l.getValue()));
+    };
+    public static final GradientFunction SIGMOID_GRAD = (o, l, r, isInvokerLeft) -> {
+        double sigmoid = o.getValue();
+        double dSigmoid = sigmoid * (1 - sigmoid);
+        return o.getGradient() * dSigmoid;
     };
     public static final GradientFunction SIMPLE_SWISH_GRAD = (o, l, r, isInvokerLeft) -> {
         double x = l.getValue();

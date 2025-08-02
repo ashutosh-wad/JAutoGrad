@@ -69,6 +69,14 @@ public class JAutogradExecutor {
         }
     }
 
+    public void op(Consumer<ComputeNode>operation) {
+        for (ComputeNode[]cArr:computeNodeBatches) {
+            for (ComputeNode node: cArr) {
+                operation.accept(node);
+            }
+        }
+    }
+
     public void clipGradients(final double maxNorm) {
         double totalNorm = 0.0;
         for (ComputeNode[] batch : computeNodeBatches) {

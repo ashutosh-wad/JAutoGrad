@@ -14,19 +14,31 @@ public class ComputeNode {
     private double gradient;
     private ComputeNode[] dependencies;
     private boolean[] dependencyDirections;
+    private boolean trainable;
 
     public ComputeNode(double value) {
-        this(null, null, NOOP_COMPUTE, NOOP_GRADIENT);
+        this(value, false);
+    }
+
+    public ComputeNode(double value, boolean trainable) {
+        this(null, null, NOOP_COMPUTE, NOOP_GRADIENT, trainable);
         this.value = value;
         calc();
     }
 
     private ComputeNode(ComputeNode left, ComputeNode right, ComputeFunction calcFunction, GradientFunction gradientFunction) {
+        //By default any operation is not trainable as in general you dont want to change values in results of operations.
+        //The framework explicitly expects you to mark parameters that you want to train as learnable
+        this(left, right, calcFunction, gradientFunction, false);
+    }
+
+    private ComputeNode(ComputeNode left, ComputeNode right, ComputeFunction calcFunction, GradientFunction gradientFunction, boolean trainable) {
         this.id = generator.getAndIncrement();
         this.left = left;
         this.right = right;
         this.calcFunction = calcFunction;
         this.gradientFunction = gradientFunction;
+        this.trainable = trainable;
         if (null != left) {
             left.addDependency(this, true);
         }
@@ -54,6 +66,14 @@ public class ComputeNode {
 
     public void setGradient(double gradient) {
         this.gradient = gradient;
+    }
+
+    public boolean isTrainable() {
+        return trainable;
+    }
+
+    public void setTrainable(boolean trainable) {
+        this.trainable = trainable;
     }
 
     protected void addDependency(ComputeNode dependency, boolean isLeft) {
@@ -135,6 +155,10 @@ public class ComputeNode {
         return new ComputeNode(this, o, POW, POW_GRAD);
     }
 
+    public ComputeNode sqrt() {
+        return new ComputeNode(this, null, SQRT, SQRT_GRAD);
+    }
+
     public ComputeNode max(ComputeNode o) {
         return new ComputeNode(this, o, MAX, MAX_GRAD);
     }
@@ -185,6 +209,10 @@ public class ComputeNode {
 
     public ComputeNode log() {
         return new ComputeNode(this, null, LOG, LOG_GRAD);
+    }
+
+    public ComputeNode sigmoid() {
+        return new ComputeNode(this, null, SIGMOID, SIGMOID_GRAD);
     }
 
     public ComputeNode simpleSwish() {

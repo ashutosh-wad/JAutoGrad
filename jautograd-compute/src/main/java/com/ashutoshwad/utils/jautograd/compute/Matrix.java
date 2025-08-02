@@ -1,5 +1,8 @@
 package com.ashutoshwad.utils.jautograd.compute;
 
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Random;
 import java.util.function.BiFunction;
 import java.util.function.DoubleSupplier;
 import java.util.function.Function;
@@ -14,6 +17,16 @@ public class Matrix {
         this.matrix = matrix;
     }
 
+    public static Matrix createXavierGlorotInitializedMatrix(int numRows, int numCols) {
+        return createXavierGlorotInitializedMatrix(numRows, numCols, false);
+    }
+
+    public static Matrix createXavierGlorotInitializedMatrix(int numRows, int numCols, boolean trainable) {
+        Random r = new Random();
+        double scale = Math.sqrt(6.0/(numRows + numCols));
+        return createMatrix(numRows, numCols, () -> ((r.nextDouble() * 2) - 1) * scale, trainable);
+    }
+
     /**
      * Create a matrix of the specified dimensions where each value is initialized
      * to zero
@@ -23,7 +36,11 @@ public class Matrix {
      * @return the newly created matrix
      */
     public static Matrix createMatrix(int numRows, int numCols) {
-        return createMatrix(numRows, numCols, () -> 0.0);
+        return createMatrix(numRows, numCols, false);
+    }
+
+    public static Matrix createMatrix(int numRows, int numCols, boolean trainable) {
+        return createMatrix(numRows, numCols, () -> 0.0, trainable);
     }
 
     /**
@@ -35,13 +52,17 @@ public class Matrix {
      * @return the newly created matrix
      */
     public static Matrix createMatrix(int numRows, int numCols, DoubleSupplier supplier) {
+        return createMatrix(numRows, numCols, supplier, false);
+    }
+
+    public static Matrix createMatrix(int numRows, int numCols, DoubleSupplier supplier, boolean trainable) {
         if (numRows == 0 || numCols == 0) {
             throw new IllegalArgumentException("Matrices with length 0 are not allowed!");
         }
         ComputeNode[][] retVal = new ComputeNode[numRows][numCols];
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numCols; j++) {
-                retVal[i][j] = new ComputeNode(supplier.getAsDouble());
+                retVal[i][j] = new ComputeNode(supplier.getAsDouble(), trainable);
             }
         }
         return new Matrix(retVal);
@@ -193,7 +214,7 @@ public class Matrix {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
-                sb.append(matrix[i][j].getValue() + "\t");
+                sb.append(String.format("%9.5f", matrix[i][j].getValue()) + "\t");
             }
             sb.append("\n");
         }
@@ -204,7 +225,9 @@ public class Matrix {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
-                sb.append("(" + matrix[i][j].getValue() + ", " + matrix[i][j].getGradient() + ")" + "\t");
+                String value = String.format("%9.5f", matrix[i][j].getValue());
+                String gradient = String.format("%9.5f", matrix[i][j].getGradient());
+                sb.append("(" + value + ", " + gradient + ")" + "\t");
             }
             sb.append("\n");
         }
@@ -226,5 +249,68 @@ public class Matrix {
 
     public Matrix mul(Matrix m) {
         return elementwiseOp(m, (a, b) -> a.mul(b));
+    }
+
+    //Aggregator methods
+    public Matrix sum() {
+        Queue<ComputeNode> resultList = new LinkedList<>();
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                resultList.add(matrix[i][j]);
+            }
+        }
+        while(resultList.size() > 1) {
+            ComputeNode a = resultList.poll();
+            ComputeNode b = resultList.poll();
+            resultList.add(a.add(b));
+        }
+
+        ComputeNode[][]retVal = new ComputeNode[1][1];
+        retVal[0][0] = resultList.poll();
+        return new Matrix(retVal);
+    }
+
+    //Adding compute node functions
+    public Matrix sin() {
+        return op(node -> node.sin());
+    }
+    public Matrix cos() {
+        return op(node -> node.cos());
+    }
+    public Matrix tan() {
+        return op(node -> node.tan());
+    }
+    public Matrix sinh() {
+        return op(node -> node.sinh());
+    }
+    public Matrix cosh() {
+        return op(node -> node.cosh());
+    }
+    public Matrix tanh() {
+        return op(node -> node.tanh());
+    }
+    public Matrix relu() {
+        return op(node -> node.relu());
+    }
+    public Matrix leakyRelu(double negSlope) {
+        return op(node -> node.leakyRelu(negSlope));
+    }
+    public Matrix exp() {
+        return op(node -> node.exp());
+    }
+    public Matrix ln() {
+        return op(node -> node.ln());
+    }
+    public Matrix log() {
+        return op(node -> node.log());
+    }
+    public Matrix sigmoid() {
+        return op(node -> node.sigmoid());
+    }
+    public Matrix sqrt() {
+        return op(node -> node.sqrt());
+    }
+    public Matrix simpleSwish() {
+        return op(node -> node.simpleSwish());
     }
 }
