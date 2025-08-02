@@ -136,11 +136,11 @@ public class ComputeNode {
     }
 
     public ComputeNode max(ComputeNode o) {
-        return new ComputeNode(this, o, MAX, NOOP_GRADIENT);
+        return new ComputeNode(this, o, MAX, MAX_GRAD);
     }
 
     public ComputeNode min(ComputeNode o) {
-        return new ComputeNode(this, o, MIN, NOOP_GRADIENT);
+        return new ComputeNode(this, o, MIN, MIN_GRAD);
     }
 
     public ComputeNode sin() {
@@ -185,5 +185,9 @@ public class ComputeNode {
 
     public ComputeNode log() {
         return new ComputeNode(this, null, LOG, LOG_GRAD);
+    }
+
+    public ComputeNode simpleSwish() {
+        return new ComputeNode(this, null, SIMPLE_SWISH, SIMPLE_SWISH_GRAD);
     }
 }

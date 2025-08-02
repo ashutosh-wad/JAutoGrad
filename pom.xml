@@ -10,5 +10,6 @@
         <module>jautograd-core</module>
         <module>jautograd-test</module>
         <module>jautograd-compute</module>
+        <module>jautograd-core-models</module>
     </modules>
 </project>

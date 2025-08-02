@@ -21,6 +21,11 @@ class FunctionRegistry {
     public static final ComputeFunction EXP = (l, r, t) -> t.setValue(Math.exp(l.getValue()));
     public static final ComputeFunction LN = (l, r, t) -> t.setValue(Math.log(l.getValue()));
     public static final ComputeFunction LOG = (l, r, t) -> t.setValue(Math.log10(l.getValue()));
+    public static final ComputeFunction SIMPLE_SWISH = (l, r, t) -> {
+        double x = l.getValue();
+        double result = x / (1 + Math.exp(-1 * x));
+        t.setValue(result);
+    };
 
     public static final GradientFunction NOOP_GRADIENT = (o, l, r, isInvokerLeft) -> 0;
     public static final GradientFunction ADD_GRAD = (o, l, r, isInvokerLeft) -> {
@@ -37,6 +42,28 @@ class FunctionRegistry {
     };
     public static final GradientFunction POW_GRAD = (o, l, r, isInvokerLeft) -> {
         return isInvokerLeft ? o.getGradient() * r.getValue() * Math.pow(l.getValue(), (r.getValue() - 1)) : o.getGradient() * o.getValue() * Math.log(l.getValue());
+    };
+    public static final GradientFunction MAX_GRAD = (o, l, r, isInvokerLeft) -> {
+        double diff = Math.abs(l.getValue() - r.getValue());
+        if (diff < 1e-8) {
+            return 0.5 * o.getGradient();
+        }
+        if (l.getValue() > r.getValue()) {
+            return isInvokerLeft ? o.getGradient() : 0;
+        } else {
+            return isInvokerLeft ? 0 : o.getGradient();
+        }
+    };
+    public static final GradientFunction MIN_GRAD = (o, l, r, isInvokerLeft) -> {
+        double diff = Math.abs(l.getValue() - r.getValue());
+        if (diff < 1e-8) {
+            return 0.5 * o.getGradient();
+        }
+        if (l.getValue() > r.getValue()) {
+            return isInvokerLeft ? 0 : o.getGradient();
+        } else {
+            return isInvokerLeft ? o.getGradient() : 0;
+        }
     };
     public static final GradientFunction SIN_GRAD = (o, l, r, isInvokerLeft) -> {
         return o.getGradient() * Math.cos(l.getValue());
@@ -79,5 +106,11 @@ class FunctionRegistry {
     private static final double LN10 = Math.log(10);
     public static final GradientFunction LOG_GRAD = (o, l, r, isInvokerLeft) -> {
         return o.getGradient() * (1 / (LN10 * l.getValue()));
+    };
+    public static final GradientFunction SIMPLE_SWISH_GRAD = (o, l, r, isInvokerLeft) -> {
+        double x = l.getValue();
+        double sigmoid = 1.0 / (1.0 + Math.exp(-x));
+        double swishGrad = sigmoid + x * sigmoid * (1.0 - sigmoid);
+        return o.getGradient() * swishGrad;
     };
 }

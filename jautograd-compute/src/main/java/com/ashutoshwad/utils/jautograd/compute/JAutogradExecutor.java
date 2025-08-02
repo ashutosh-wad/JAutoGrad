@@ -69,6 +69,30 @@ public class JAutogradExecutor {
         }
     }
 
+    public void clipGradients(final double maxNorm) {
+        double totalNorm = 0.0;
+        for (ComputeNode[] batch : computeNodeBatches) {
+            for (ComputeNode node : batch) {
+                double grad = node.getGradient();
+                totalNorm += grad * grad;
+            }
+        }
+        totalNorm = Math.sqrt(totalNorm);
+
+        if (totalNorm > maxNorm) {
+            double scale = maxNorm / totalNorm;
+            for (ComputeNode[] batch : computeNodeBatches) {
+                for (ComputeNode node : batch) {
+                    node.setGradient(node.getGradient() * scale);
+                }
+            }
+        }
+    }
+
+    public void cleanup() {
+        executorService.shutdown();
+    }
+
     private static final class ComputeNodeExecutor implements Runnable {
         private final ComputeNode[] computeNodes;
         private final int start;
