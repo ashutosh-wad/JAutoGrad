@@ -10,11 +10,20 @@ import java.util.function.Function;
 public class Matrix {
     private final ComputeNode[][] matrix;
 
-    private Matrix(ComputeNode[][] matrix) {
+    public Matrix(ComputeNode[][] matrix) {
         if (matrix.length == 0 || matrix[0].length == 0) {
             throw new IllegalArgumentException("Matrices with length 0 are not allowed!");
         }
         this.matrix = matrix;
+    }
+
+    public Matrix(Matrix m) {
+        this.matrix = new ComputeNode[m.rowLength()][m.columnLength()];
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < matrix[i].length; j++) {
+                this.matrix[i][j] = m.matrix[i][j];
+            }
+        }
     }
 
     public static Matrix createXavierGlorotInitializedMatrix(int numRows, int numCols) {
@@ -66,6 +75,14 @@ public class Matrix {
             }
         }
         return new Matrix(retVal);
+    }
+
+    public int rowLength() {
+        return matrix.length;
+    }
+
+    public int columnLength() {
+        return matrix[0].length;
     }
 
     /**

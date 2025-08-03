@@ -1,5 +1,10 @@
 package com.ashutoshwad.utils.jautograd.compute;
 
+import com.ashutoshwad.utils.jautograd.compute.optimizer.LearningOptimizer;
+import com.ashutoshwad.utils.jautograd.compute.optimizer.LearningOptimizerType;
+import com.ashutoshwad.utils.jautograd.compute.optimizer.StochasticGradientDescentOptimizer;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -11,15 +16,17 @@ public class JAutogradExecutor {
     private final int threadCount;
     private final ExecutorService executorService;
     private final List<ComputeNode[]> computeNodeBatches;
+    private final List<LearningOptimizer> optimizers;
 
     public JAutogradExecutor(List<ComputeNode[]> computeNodeBatches) {
         this(Runtime.getRuntime().availableProcessors(), computeNodeBatches);
     }
 
     public JAutogradExecutor(int threadCount, List<ComputeNode[]> computeNodeBatches) {
-        this.threadCount = Runtime.getRuntime().availableProcessors();
+        this.threadCount = threadCount;
         this.executorService = Executors.newFixedThreadPool(threadCount);
         this.computeNodeBatches = computeNodeBatches;
+        this.optimizers = new LinkedList<>();
     }
 
     public void zeroGrad() {
@@ -70,11 +77,7 @@ public class JAutogradExecutor {
     }
 
     public void op(Consumer<ComputeNode>operation) {
-        for (ComputeNode[]cArr:computeNodeBatches) {
-            for (ComputeNode node: cArr) {
-                operation.accept(node);
-            }
-        }
+        forwardPass(operation);
     }
 
     public void clipGradients(final double maxNorm) {
@@ -97,10 +100,79 @@ public class JAutogradExecutor {
         }
     }
 
+    public void initializeOptimizer(LearningOptimizerType type) {
+        optimizers.clear();
+        for (ComputeNode[]computeNode:computeNodeBatches) {
+            for (ComputeNode node:computeNode) {
+                switch (type) {
+                    case SGD:
+                        optimizers.add(new StochasticGradientDescentOptimizer(node));
+                        break;
+                    case ADAM: throw new UnsupportedOperationException("ADAM is not yet supported");
+                    default:
+                        throw new UnsupportedOperationException(type + " is not yet supported");
+                }
+            }
+        }
+    }
+
+    public void learn(double learningRate) {
+        if(optimizers.size() == 0) {
+            throw new RuntimeException("You need to call `initializeOptimizer` first to set the optimizer type");
+        }
+        final int batchSize = 10000 * threadCount;
+        List<LearningOptimizer>batch = new ArrayList<>(batchSize);
+        for (LearningOptimizer opt:optimizers) {
+            batch.add(opt);
+            if(batch.size() == batchSize) {
+                executeOptimizersInParallel(batch, learningRate);
+                batch.clear();
+            }
+        }
+        if(!batch.isEmpty()) {
+            executeOptimizersInParallel(batch, learningRate);
+            batch.clear();
+        }
+    }
+
+    private void executeOptimizersInParallel(List<LearningOptimizer>batch, double learningRate) {
+        List<Future<?>>futures = new ArrayList<>();
+        for (int i = 0; i < threadCount; i++) {
+            futures.add(executorService.submit(new OptimizerExecutor(batch, i, threadCount, learningRate)));
+        }
+        for (int i = 0; i < threadCount; i++) {
+            try {
+                futures.get(i).get();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     public void cleanup() {
         executorService.shutdown();
     }
 
+    private static final class OptimizerExecutor implements Runnable {
+        private final List<LearningOptimizer> optimizers;
+        private final int start;
+        private final int stride;
+        private final double learningRate;
+
+        public OptimizerExecutor(List<LearningOptimizer> optimizers, int start, int stride, double learningRate) {
+            this.optimizers = optimizers;
+            this.start = start;
+            this.stride = stride;
+            this.learningRate = learningRate;
+        }
+
+        @Override
+        public void run() {
+            for (int i = start; i < optimizers.size(); i+=stride) {
+                optimizers.get(i).learn(learningRate);
+            }
+        }
+    }
     private static final class ComputeNodeExecutor implements Runnable {
         private final ComputeNode[] computeNodes;
         private final int start;

@@ -1,9 +1,16 @@
 package com.ashutoshwad.utils.jautograd.compute;
 
 import static org.junit.Assert.*;
+
+import com.ashutoshwad.utils.jautograd.compute.optimizer.LearningOptimizerType;
 import org.junit.Test;
 
 public class XORNetworTest {
+    @Test
+    public void temp() {
+        double base = 1.0 / 10000.0;
+        System.out.println(String.format("%.6f", base));
+    }
     @Test
     public void xorMatrixTest() {
         Matrix input = createInputMatrix();
@@ -32,15 +39,13 @@ public class XORNetworTest {
         loss = loss.sqrt();
 
         JAutogradExecutor executor = loss.get(0, 0).createExecutor(4);
+        executor.initializeOptimizer(LearningOptimizerType.SGD);
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10000; i++) {
             executor.zeroGradAndForward();
             executor.backward();
-            executor.op(node -> {
-                if(node.isTrainable()) {
-                    node.setValue(node.getValue() + 0.1 * (node.getGradient() * -1));
-                }
-            });
+            executor.clipGradients(5.0);
+            executor.learn(0.1);
         }
 
         System.out.println(input);
