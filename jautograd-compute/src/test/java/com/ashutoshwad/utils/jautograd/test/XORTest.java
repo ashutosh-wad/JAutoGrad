@@ -2,16 +2,15 @@ package com.ashutoshwad.utils.jautograd.test;
 
 import com.ashutoshwad.utils.jautograd.ExecutorFactory;
 import com.ashutoshwad.utils.jautograd.Matrix;
-import com.ashutoshwad.utils.jautograd.optimizer.AdamOptimizer;
 import com.ashutoshwad.utils.jautograd.optimizer.AdamWOptimizer;
 import com.ashutoshwad.utils.jautograd.optimizer.GradientClipper;
-import com.ashutoshwad.utils.jautograd.optimizer.StocasticGradientDescentOptimizer;
 import org.junit.jupiter.api.Test;
 
 import java.util.LinkedList;
 import java.util.Queue;
 
 public class XORTest {
+    private static final double LEARNING_RATE = 0.01;
     private Matrix input;
     private Matrix target;
     private Matrix hiddenWeights;
@@ -29,14 +28,14 @@ public class XORTest {
         target = createXORTarget();
 
         // Initialize network parameters
-        this.hiddenWeights = Matrix.createXavierGlorotInitializedMatrix(2, 8, true);  // 2 -> 8 hidden
+        this.hiddenWeights = Matrix.createXavierGlorotInitializedMatrix(2, 8, true);
         this.hiddenBias = Matrix.create(1, 8, () -> 0.0, true);
-        this.outputWeights = Matrix.createXavierGlorotInitializedMatrix(8, 1, true);  // 8 -> 1 output
+        this.outputWeights = Matrix.createXavierGlorotInitializedMatrix(8, 1, true);
         this.outputBias = Matrix.create(1, 1, () -> 0.0, true);
 
         // Setup optimizer and gradient clipper
-        this.optimizer = new AdamWOptimizer(0.01);  // Learning rate
-        this.clipper = new GradientClipper(0.01);
+        this.optimizer = new AdamWOptimizer(LEARNING_RATE);
+        this.clipper = new GradientClipper(LEARNING_RATE);
 
         // Add all parameters to optimizer and clipper
         addParametersToOptimizer();
@@ -45,22 +44,14 @@ public class XORTest {
         Matrix intermediate = input.matmul(hiddenWeights).add(hiddenBias).swish();
         Matrix output = intermediate.matmul(outputWeights).add(outputBias).sigmoid();
 
-        Matrix loss_1 = output.sub(target);
-        Matrix loss = mse(loss_1);
+        Matrix loss = mse(output.sub(target));
         loss.backward();
 
-        train(1000, output, target, loss);
+        train(1000, output, loss);
+        validate(output, loss);
     }
 
-    private void printMatrix(String name, Matrix weights) {
-        System.out.println("Matrix: " + name);
-        System.out.println("Values: ");
-        System.out.println(weights.getPrintableMatrixValues());
-        System.out.println("Gradients: ");
-        System.out.println(weights.getPrintableMatrixGradients());
-    }
-
-    public void train(int epochs, Matrix prediction, Matrix target, Matrix loss) {
+    public void train(int epochs, Matrix prediction, Matrix loss) {
         System.out.println("Starting XOR training with your Matrix framework...");
         System.out.println("Epoch\tLoss\t\tPredictions");
         System.out.println("-----\t----\t\t-----------");
@@ -72,7 +63,7 @@ public class XORTest {
             // Zero gradients
             loss.zeroGrad();
 
-            // Backward pass - compute MSE gradient manually
+            // Backward pass
             loss.backward();
 
             // Clip gradients
@@ -89,12 +80,10 @@ public class XORTest {
                         prediction.getValue(1, 0),
                         prediction.getValue(2, 0),
                         prediction.getValue(3, 0));
-
-                System.out.println("Prediction");
-                System.out.println(prediction.getPrintableMatrixValues());
             }
         }
     }
+
 
     public void validate(Matrix prediction, Matrix loss) {
         System.out.println("\n=== Final Validation ===");
@@ -121,11 +110,11 @@ public class XORTest {
                 allCorrect = false;
             }
         }
-
-        System.out.println("\nResult: " + (allCorrect ? "🎉 PASSED! Your framework learned XOR!" : "❌ Failed to learn XOR"));
+        System.out.println("\nResult: " + (allCorrect ? "PASSED! Your framework learned XOR!" : "Failed to learn XOR"));
     }
 
     private Matrix mse(Matrix loss) {
+        //Compute and return the mean squared loss
         loss = loss.mul(loss);
         Matrix[][]temp = loss.explode();
         Queue<Matrix>listToAdd = new LinkedList<>();
@@ -140,7 +129,7 @@ public class XORTest {
             listToAdd.add(a.add(b));
         }
         loss = listToAdd.poll();
-        //loss = loss.sqrt();
+        loss = loss.sqrt();
         return loss;
     }
 
