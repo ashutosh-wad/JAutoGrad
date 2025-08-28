@@ -7,8 +7,6 @@
   <version>1.0-SNAPSHOT</version>
   <name>JAutoGrad</name>
   <modules>
-    <module>jautograd-core</module>
-    <module>jautograd-test</module>
-      <module>jautograd-compute</module>
+    <module>jautograd-compute</module>
   </modules>
 </project>
