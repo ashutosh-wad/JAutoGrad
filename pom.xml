@@ -8,5 +8,6 @@
   <name>JAutoGrad</name>
   <modules>
     <module>jautograd-compute</module>
+    <module>jautograd-transformer</module>
   </modules>
 </project>

@@ -423,8 +423,8 @@ public class Matrix extends AbstractMatrix {
     }
 
     // Get arbitrary slice
-    public Matrix slice(int rowStart, int rowEnd, int colStart, int colEnd) {
-        return new SplitView(this, rowStart, rowEnd - rowStart, colStart, colEnd - colStart);
+    public Matrix slice(int rowStart, int numRows, int colStart, int numCols) {
+        return new SplitView(this, rowStart, numRows, colStart, numCols);
     }
 
     // Get single row/column
