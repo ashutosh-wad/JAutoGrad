@@ -26,7 +26,7 @@ public class ScaledDotProductAttention {
         this.queryBias = Matrix.create(1, keyDimensionSize, true);
         this.value = Matrix.createXavierGlorotInitializedMatrix(featureSize, valueDimensionSize, true);
         this.valueBias = Matrix.create(1, valueDimensionSize, true);
-        this.scale = Matrix.create(Math.sqrt(keyDimensionSize));
+        this.scale = Matrix.create((float)Math.sqrt(keyDimensionSize));
         this.dropout = dropout;
         this.dropoutRate = dropoutRate;
     }

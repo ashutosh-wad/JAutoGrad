@@ -59,23 +59,23 @@ public class HorizontalConcatView extends Matrix  {
     }
 
     // Accessor methods
-    public double getValue(int row, int column) {
+    public float getValue(int row, int column) {
         IndexTuple tup = mapCols(column);
         return matrices[tup.matrixNum].getValue(row, tup.columnIndex);
     }
-    public synchronized void setValue(int row, int column, double value) {
+    public synchronized void setValue(int row, int column, float value) {
         IndexTuple tup = mapCols(column);
         matrices[tup.matrixNum].setValue(row, tup.columnIndex, value);
     }
-    public double getGradient(int row, int column) {
+    public float getGradient(int row, int column) {
         IndexTuple tup = mapCols(column);
         return matrices[tup.matrixNum].getGradient(row, tup.columnIndex);
     }
-    public synchronized void setGradient(int row, int column, double value) {
+    public synchronized void setGradient(int row, int column, float value) {
         IndexTuple tup = mapCols(column);
         matrices[tup.matrixNum].setGradient(row, tup.columnIndex, value);
     }
-    public synchronized void accumulateGradient(int row, int column, double value) {
+    public synchronized void accumulateGradient(int row, int column, float value) {
         IndexTuple tup = mapCols(column);
         matrices[tup.matrixNum].accumulateGradient(row, tup.columnIndex, value);
     }

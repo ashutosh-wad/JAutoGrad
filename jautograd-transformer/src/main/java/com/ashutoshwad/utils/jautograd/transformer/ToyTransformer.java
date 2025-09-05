@@ -20,7 +20,7 @@ public class ToyTransformer {
     }
 
     public Matrix create(int contextSize) {
-        input = Matrix.create(contextSize, tokenSize, ()->0.0,false);
+        input = Matrix.create(contextSize, tokenSize, ()->0.0f,false);
         featureMatrix = Matrix.createXavierGlorotInitializedMatrix(tokenSize, featureSize, true);
 
         Matrix layerInput = input.matmul(featureMatrix);

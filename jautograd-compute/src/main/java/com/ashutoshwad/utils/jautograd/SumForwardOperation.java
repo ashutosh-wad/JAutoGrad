@@ -16,6 +16,6 @@ class SumForwardOperation extends ForwardComputeOperation {
                 sum += source.getValue(row, col);
             }
         }
-        result.setValue(0, 0, sum);
+        result.setValue(0, 0, (float)sum);
     }
 }

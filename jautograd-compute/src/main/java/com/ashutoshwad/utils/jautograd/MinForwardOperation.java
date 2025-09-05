@@ -21,6 +21,6 @@ class MinForwardOperation extends ForwardComputeOperation {
                 }
             }
         }
-        result.setValue(0, 0, min);
+        result.setValue(0, 0, (float)min);
     }
 }

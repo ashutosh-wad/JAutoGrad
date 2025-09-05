@@ -87,7 +87,7 @@ public class AdamWOptimizer {
 
                     double value = parameters.getValue(row, col);
                     double updatedValue = value - learningRate * (mPrime / (Math.sqrt(vPrime) + EPSILON) + DECAY_RATE * value);
-                    parameters.setValue(row, col, updatedValue);
+                    parameters.setValue(row, col, (float)updatedValue);
                 }
             }
         }

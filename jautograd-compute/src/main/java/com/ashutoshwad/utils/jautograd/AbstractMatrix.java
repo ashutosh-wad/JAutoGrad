@@ -1,15 +1,13 @@
 package com.ashutoshwad.utils.jautograd;
 
-import java.util.Arrays;
-
 class AbstractMatrix {
-    private final double[][] value;
-    private final double[][] gradient;
+    private final MatrixStorage value;
+    private final MatrixStorage gradient;
     protected final boolean requiresGradient;
     protected final ForwardComputeOperation forwardComputeOperation;
     protected final BackwardComputeOperation backwardComputeOperation;
 
-    protected AbstractMatrix(double[][] value, double[][] gradient, boolean requiresGradient, ForwardComputeOperation forwardComputeOperation, BackwardComputeOperation backwardComputeOperation) {
+    protected AbstractMatrix(MatrixStorage value, MatrixStorage gradient, boolean requiresGradient, ForwardComputeOperation forwardComputeOperation, BackwardComputeOperation backwardComputeOperation) {
         this.value = value;
         this.gradient = gradient;
         this.requiresGradient = requiresGradient;
@@ -18,39 +16,39 @@ class AbstractMatrix {
     }
 
     // Accessor methods
-    public void fill(double value) {
+    public void fill(float value) {
         for (int row = 0; row < numRows(); row++) {
             for (int col = 0; col < numCols(); col++) {
                 setValue(row, col, value);
             }
         }
     }
-    public double getValue() {
+    public float getValue() {
         return getValue(0, 0);
     }
-    public double getGradient() {
+    public float getGradient() {
         return getGradient(0, 0);
     }
-    public double getValue(int row, int column) {
-        return this.value[row][column];
+    public float getValue(int row, int column) {
+        return this.value.get(row, column);
     }
-    public synchronized void setValue(int row, int column, double value) {
-        this.value[row][column]=value;
+    public synchronized void setValue(int row, int column, float value) {
+        this.value.set(row, column, value);
     }
-    public double getGradient(int row, int column) {
-        return this.gradient[row][column];
+    public float getGradient(int row, int column) {
+        return this.gradient.get(row, column);
     }
-    public synchronized void setGradient(int row, int column, double value) {
-        this.gradient[row][column]=value;
+    public synchronized void setGradient(int row, int column, float value) {
+        this.gradient.set(row, column, value);
     }
-    public synchronized void accumulateGradient(int row, int column, double value) {
-        this.gradient[row][column]+=value;
+    public synchronized void accumulateGradient(int row, int column, float value) {
+        this.gradient.accumulate(row, column, value);
     }
     public int numRows() {
-        return this.value.length;
+        return this.value.getNumRows();
     }
     public int numCols() {
-        return this.value[0].length;
+        return this.value.getNumCols();
     }
     public boolean getRequiresGradient() {
         return requiresGradient;

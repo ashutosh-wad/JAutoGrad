@@ -8,19 +8,19 @@ public class TransposeView extends Matrix {
     }
 
     //Override accessors
-    public double getValue(int row, int column) {
+    public float getValue(int row, int column) {
         return original.getValue(column, row);
     }
-    public synchronized void setValue(int row, int column, double value) {
+    public synchronized void setValue(int row, int column, float value) {
         original.setValue(column, row, value);
     }
-    public double getGradient(int row, int column) {
+    public float getGradient(int row, int column) {
         return original.getGradient(column, row);
     }
-    public synchronized void setGradient(int row, int column, double value) {
+    public synchronized void setGradient(int row, int column, float value) {
         original.setGradient(column, row, value);
     }
-    public synchronized void accumulateGradient(int row, int column, double value) {
+    public synchronized void accumulateGradient(int row, int column, float value) {
         original.accumulateGradient(column, row, value);
     }
     public int numRows() {

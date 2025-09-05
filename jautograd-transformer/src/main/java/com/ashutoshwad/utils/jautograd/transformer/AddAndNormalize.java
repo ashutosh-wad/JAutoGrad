@@ -6,8 +6,8 @@ public class AddAndNormalize {
     private Matrix scale;
     private Matrix shift;
     public AddAndNormalize(int featureSize) {
-        scale = Matrix.create(1, featureSize, ()->1.0, true);
-        shift = Matrix.create(1, featureSize, ()->0.0, true);
+        scale = Matrix.create(1, featureSize, ()->1.0f, true);
+        shift = Matrix.create(1, featureSize, ()->0.0f, true);
     }
 
     public Matrix apply(Matrix residual, Matrix input) {

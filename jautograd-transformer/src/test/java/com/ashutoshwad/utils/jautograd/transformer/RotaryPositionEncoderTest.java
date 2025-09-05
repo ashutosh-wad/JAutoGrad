@@ -5,13 +5,14 @@ import com.ashutoshwad.utils.jautograd.Matrix;
 import org.junit.jupiter.api.Test;
 
 public class RotaryPositionEncoderTest {
+    public static final double EPSILON = 1e-6;
     @Test
     public void testRopeWorks() {
-        Matrix matty = Matrix.create(2, 8, ()->0.2);
+        Matrix matty = Matrix.create(2, 8, ()->0.2f);
         for (int row = 0; row < matty.numRows(); row++) {
             double start = 0.1;
             for (int col = 0; col < matty.numCols(); col++) {
-                matty.setValue(row, col, start);
+                matty.setValue(row, col, (float)start);
                 start+=0.1;
             }
         }
@@ -31,8 +32,8 @@ public class RotaryPositionEncoderTest {
         double bSinTheta = b * Math.sin(1);
         System.out.println("bSinTheta: " + bSinTheta);
         System.out.println("aCosTheta + bSinTheta: " + (aCosTheta + bSinTheta));
-        assertEquals((aCosTheta + bSinTheta),rotated.getValue(1, 0), 1e-9);
+        assertEquals((aCosTheta + bSinTheta),rotated.getValue(1, 0), EPSILON);
         System.out.println("bCosTheta - aSinTheta: " + (bCosTheta - aSinTheta));
-        assertEquals((bCosTheta - aSinTheta),rotated.getValue(1, 1), 1e-9);
+        assertEquals((bCosTheta - aSinTheta),rotated.getValue(1, 1), EPSILON);
     }
 }

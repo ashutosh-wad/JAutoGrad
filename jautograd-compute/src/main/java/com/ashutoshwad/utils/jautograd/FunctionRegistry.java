@@ -1,11 +1,15 @@
 package com.ashutoshwad.utils.jautograd;
 
 class FunctionRegistry {
-    private static final double EPSILON = 1e-9;
+    /**
+     * We use epsilon value of 10^-6 for epsilon and 1e-9 for a nan guard when this is used with float precision.
+     * If using double precision we prefer a difference of 3 i.e. epsilon of 1e-9 and 1e-12 for nanguard.
+     */
+    public static final double EPSILON = 1e-6;
 
     private static double nanGuard(double x) {
-        if (Math.abs(x) < 1e-12) {
-            return x >= 0 ? 1e-12 : -1e-12;
+        if (Math.abs(x) < 1e-9) {
+            return x >= 0 ? 1e-9 : -1e-9;
         } else {
             return x;
         }

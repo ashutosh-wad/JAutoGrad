@@ -68,19 +68,19 @@ public class DropoutView extends Matrix {
     }
 
     @Override
-    public double getValue(int row, int column) {
-        return isDropout(row, column) ? 0 : source.getValue(row, column) * scale;
+    public float getValue(int row, int column) {
+        return isDropout(row, column) ? 0 : source.getValue(row, column) * (float)scale;
     }
 
     @Override
-    public synchronized void setValue(int row, int column, double value) {
+    public synchronized void setValue(int row, int column, float value) {
         if(!isDropout(row, column)) {
             source.setValue(row, column, value);
         }
     }
 
     @Override
-    public double getGradient(int row, int column) {
+    public float getGradient(int row, int column) {
         if (isDropout(row, column)) {
             return 0;
         } else {
@@ -89,7 +89,7 @@ public class DropoutView extends Matrix {
     }
 
     @Override
-    public synchronized void setGradient(int row, int column, double value) {
+    public synchronized void setGradient(int row, int column, float value) {
         if (isDropout(row, column)) {
             return;
         }
@@ -97,7 +97,7 @@ public class DropoutView extends Matrix {
     }
 
     @Override
-    public synchronized void accumulateGradient(int row, int column, double value) {
+    public synchronized void accumulateGradient(int row, int column, float value) {
         if (isDropout(row, column)) {
             return;
         }

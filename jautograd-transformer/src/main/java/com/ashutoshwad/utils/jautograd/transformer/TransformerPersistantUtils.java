@@ -10,7 +10,7 @@ public class TransformerPersistantUtils {
         try {
             for (int row = 0; row < mat.numRows(); row++) {
                 for (int col = 0; col < mat.numCols(); col++) {
-                    mat.setValue(row, col, is.readDouble());
+                    mat.setValue(row, col, is.readFloat());
                 }
             }
         } catch (Exception e) {
@@ -22,7 +22,7 @@ public class TransformerPersistantUtils {
         try {
             for (int row = 0; row < mat.numRows(); row++) {
                 for (int col = 0; col < mat.numCols(); col++) {
-                    os.writeDouble(mat.getValue(row, col));
+                    os.writeFloat(mat.getValue(row, col));
                 }
             }
         } catch (Exception e) {

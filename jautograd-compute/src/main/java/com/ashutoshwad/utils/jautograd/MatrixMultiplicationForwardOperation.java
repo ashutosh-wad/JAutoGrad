@@ -58,7 +58,7 @@ class MatrixMultiplicationForwardOperation extends ForwardComputeOperation {
                     accumulator += left.getValue(row, hIndex) * right.getValue(hIndex, column);
                 }
 
-                result.setValue(row, column, accumulator);
+                result.setValue(row, column, (float)accumulator);
             }
         }
     }

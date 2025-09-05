@@ -54,7 +54,7 @@ public class ElementWiseUnaryBackwardOperation extends BackwardComputeOperation 
                 double resultValue = result.getValue(row, column);
                 double resultGradient = result.getGradient(row, column);
                 double inputGradient = backwardFunction.result(inputValue, resultValue, resultGradient);
-                input.accumulateGradient(row, column, inputGradient);
+                input.accumulateGradient(row, column, (float)inputGradient);
             }
         }
     }

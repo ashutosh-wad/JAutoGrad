@@ -25,7 +25,7 @@ class SumForwardByAxisOperation extends ForwardComputeOperation {
             for (int row = 0; row < source.numRows(); row++) {
                 temp += source.getValue(row, col);
             }
-            result.setValue(0, col, temp);
+            result.setValue(0, col, (float)temp);
         }
     }
 
@@ -36,7 +36,7 @@ class SumForwardByAxisOperation extends ForwardComputeOperation {
             for (int col = 0; col < source.numCols(); col++) {
                 temp += source.getValue(row, col);
             }
-            result.setValue(row, 0, temp);
+            result.setValue(row, 0, (float)temp);
         }
     }
 }
