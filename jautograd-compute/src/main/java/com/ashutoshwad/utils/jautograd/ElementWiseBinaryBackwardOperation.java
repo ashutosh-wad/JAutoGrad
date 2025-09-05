@@ -69,11 +69,11 @@ public class ElementWiseBinaryBackwardOperation extends BackwardComputeOperation
                 double resultGradient = result.getGradient(row, column);
                 if (isLeftGradEnabled) {
                     double leftGradient = leftBackwardFunction.result(leftValue, rightValue, resultValue, resultGradient);
-                    left.accumulateGradient(row, column, leftGradient);
+                    left.accumulateGradient(row, column, (float) leftGradient);
                 }
                 if (isRightGradEnabled) {
                     double rightGradient = rightBackwardFunction.result(leftValue, rightValue, resultValue, resultGradient);
-                    right.accumulateGradient(row, column, rightGradient);
+                    right.accumulateGradient(row, column, (float) rightGradient);
                 }
             }
         }

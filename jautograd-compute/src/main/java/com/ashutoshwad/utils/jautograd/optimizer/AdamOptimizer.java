@@ -84,7 +84,7 @@ public class AdamOptimizer {
                     double vPrime = variance / (1 - Math.pow(VARIANCE_BETA, step));
 
                     double updatedValue = parameters.getValue(row, col) - learningRate * mPrime / (Math.sqrt(vPrime) + EPSILON);
-                    parameters.setValue(row, col, updatedValue);
+                    parameters.setValue(row, col, (float)updatedValue);
                 }
             }
         }

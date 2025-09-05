@@ -30,7 +30,7 @@ class MaxForwardByAxisOperation extends ForwardComputeOperation {
                     max = Math.max(max, sourceVal);
                 }
             }
-            result.setValue(0, col, max);
+            result.setValue(0, col, (float)max);
         }
     }
 
@@ -46,7 +46,7 @@ class MaxForwardByAxisOperation extends ForwardComputeOperation {
                     max = Math.max(max, sourceVal);
                 }
             }
-            result.setValue(row, 0, max);
+            result.setValue(row, 0, (float)max);
         }
     }
 }

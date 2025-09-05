@@ -4,13 +4,13 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 public class Matrix extends AbstractMatrix {
-    public static final double EPSILON = 0.00000001;
+    public static final float EPSILON = 0.0000001f;
     private static final Random random = new Random();
 
     private record OperationTuple(Matrix a,
                                   Matrix b,
-                                  double[][] value,
-                                  double[][] gradient,
+                                  MatrixStorage value,
+                                  MatrixStorage gradient,
                                   boolean requiresGradient,
                                   ForwardComputeOperation forwardComputeOperation,
                                   BackwardComputeOperation backwardComputeOperation) {}
@@ -20,11 +20,11 @@ public class Matrix extends AbstractMatrix {
         int numCols = Math.max(numCols(), other.numCols());
         Matrix a = BroadcastView.broadcast(this, numRows, numCols);
         Matrix b = BroadcastView.broadcast(other, numRows, numCols);
-        double[][] value = new double[numRows][numCols];
-        double[][] gradient = null;
+        MatrixStorage value = new MatrixStorage(numRows, numCols);
+        MatrixStorage gradient = null;
         boolean requiresGradient = this.requiresGradient || other.requiresGradient;
         if (requiresGradient) {
-            gradient = new double[numRows][numCols];
+            gradient = new MatrixStorage(numRows, numCols);
         }
         ForwardComputeOperation forwardComputeOperation = new ElementWiseBinaryForwardOperation(a, b, calcFunction, a.forwardComputeOperation, b.forwardComputeOperation);
         BackwardComputeOperation backwardComputeOperation = null;
@@ -35,10 +35,10 @@ public class Matrix extends AbstractMatrix {
     }
 
     private OperationTuple commonElementwiseUnaryOperationSteps(FunctionRegistry.UnaryCalcFunction calcFunction, FunctionRegistry.UnaryGradientFunction gradFunc) {
-        double[][] value = new double[this.numRows()][this.numCols()];
-        double[][] gradient = null;
+        MatrixStorage value = new MatrixStorage(this.numRows(), this.numCols());
+        MatrixStorage gradient = null;
         if (requiresGradient) {
-            gradient = new double[this.numRows()][this.numCols()];
+            gradient = new MatrixStorage(this.numRows(), this.numCols());
         }
         ForwardComputeOperation forwardComputeOperation = new ElementWiseUnaryForwardOperation(this, calcFunction, this.forwardComputeOperation);
         BackwardComputeOperation backwardComputeOperation = null;
@@ -85,11 +85,11 @@ public class Matrix extends AbstractMatrix {
         int numRows = numRows();
         int numCols = b.numCols();
         Matrix a = this;
-        double[][] value = new double[numRows][numCols];
-        double[][] gradient = null;
+        MatrixStorage value = new MatrixStorage(numRows, numCols);
+        MatrixStorage gradient = null;
         boolean requiresGradient = this.requiresGradient || b.requiresGradient;
         if (requiresGradient) {
-            gradient = new double[numRows][numCols];
+            gradient = new MatrixStorage(numRows, numCols);
         }
         ForwardComputeOperation forwardComputeOperation = new MatrixMultiplicationForwardOperation(a, b, a.forwardComputeOperation, b.forwardComputeOperation);
         BackwardComputeOperation backwardComputeOperation = null;
@@ -158,13 +158,13 @@ public class Matrix extends AbstractMatrix {
 
     /*Matrix reduction methods start here*/
     public Matrix sum() {
-        double[][] value = new double[1][1];
+        MatrixStorage value = new MatrixStorage(1, 1);
         ForwardComputeOperation fop = new SumForwardOperation(this, this.forwardComputeOperation);
 
-        double[][] gradient = null;
+        MatrixStorage gradient = null;
         BackwardComputeOperation bop = null;
         if (requiresGradient) {
-            gradient = new double[1][1];
+            gradient = new MatrixStorage(1, 1);
             bop = new SumBackwardOperation(this, this.backwardComputeOperation);
         }
 
@@ -188,27 +188,27 @@ public class Matrix extends AbstractMatrix {
         }
 
         if(axis == 0) {
-            double[][] value = new double[1][this.numCols()];
+            MatrixStorage value = new MatrixStorage(1, this.numCols());
             ForwardComputeOperation fop = new SumForwardByAxisOperation(this, axis, this.forwardComputeOperation);
 
-            double[][] gradient = null;
+            MatrixStorage gradient = null;
             BackwardComputeOperation bop = null;
 
             if (requiresGradient) {
-                gradient = new double[1][this.numCols()];
+                gradient = new MatrixStorage(1, this.numCols());
                 bop = new SumBackwardByAxisOperation(this, axis, this.backwardComputeOperation);
             }
 
             return new Matrix(value, gradient, requiresGradient, fop, bop);
         } else {
-            double[][] value = new double[this.numRows()][1];
+            MatrixStorage value = new MatrixStorage(this.numRows(), 1);
             ForwardComputeOperation fop = new SumForwardByAxisOperation(this, axis, this.forwardComputeOperation);
 
-            double[][] gradient = null;
+            MatrixStorage gradient = null;
             BackwardComputeOperation bop = null;
 
             if (requiresGradient) {
-                gradient = new double[this.numRows()][1];
+                gradient = new MatrixStorage(this.numRows(), 1);
                 bop = new SumBackwardByAxisOperation(this, axis, this.backwardComputeOperation);
             }
 
@@ -217,13 +217,13 @@ public class Matrix extends AbstractMatrix {
     }
 
     public Matrix max() {
-        double[][] value = new double[1][1];
+        MatrixStorage value = new MatrixStorage(1, 1);
         ForwardComputeOperation fop = new MaxForwardOperation(this, this.forwardComputeOperation);
 
-        double[][] gradient = null;
+        MatrixStorage gradient = null;
         BackwardComputeOperation bop = null;
         if (requiresGradient) {
-            gradient = new double[1][1];
+            gradient = new MatrixStorage(1, 1);
             bop = new MaxBackwardOperation(this, this.backwardComputeOperation);
         }
 
@@ -247,27 +247,27 @@ public class Matrix extends AbstractMatrix {
         }
 
         if(axis == 0) {
-            double[][] value = new double[1][this.numCols()];
+            MatrixStorage value = new MatrixStorage(1, this.numCols());
             ForwardComputeOperation fop = new MaxForwardByAxisOperation(this, axis, this.forwardComputeOperation);
 
-            double[][] gradient = null;
+            MatrixStorage gradient = null;
             BackwardComputeOperation bop = null;
 
             if (requiresGradient) {
-                gradient = new double[1][this.numCols()];
+                gradient = new MatrixStorage(1, this.numCols());
                 bop = new MaxBackwardByAxisOperation(this, axis, this.backwardComputeOperation);
             }
 
             return new Matrix(value, gradient, requiresGradient, fop, bop);
         } else {
-            double[][] value = new double[this.numRows()][1];
+            MatrixStorage value = new MatrixStorage(this.numRows(), 1);
             ForwardComputeOperation fop = new MaxForwardByAxisOperation(this, axis, this.forwardComputeOperation);
 
-            double[][] gradient = null;
+            MatrixStorage gradient = null;
             BackwardComputeOperation bop = null;
 
             if (requiresGradient) {
-                gradient = new double[this.numRows()][1];
+                gradient = new MatrixStorage(this.numRows(), 1);
                 bop = new MaxBackwardByAxisOperation(this, axis, this.backwardComputeOperation);
             }
 
@@ -276,13 +276,13 @@ public class Matrix extends AbstractMatrix {
     }
 
     public Matrix min() {
-        double[][] value = new double[1][1];
+        MatrixStorage value = new MatrixStorage(1, 1);
         ForwardComputeOperation fop = new MinForwardOperation(this, this.forwardComputeOperation);
 
-        double[][] gradient = null;
+        MatrixStorage gradient = null;
         BackwardComputeOperation bop = null;
         if (requiresGradient) {
-            gradient = new double[1][1];
+            gradient = new MatrixStorage(1, 1);
             bop = new MinBackwardOperation(this, this.backwardComputeOperation);
         }
 
@@ -306,27 +306,27 @@ public class Matrix extends AbstractMatrix {
         }
 
         if(axis == 0) {
-            double[][] value = new double[1][this.numCols()];
+            MatrixStorage value = new MatrixStorage(1, this.numCols());
             ForwardComputeOperation fop = new MinForwardByAxisOperation(this, axis, this.forwardComputeOperation);
 
-            double[][] gradient = null;
+            MatrixStorage gradient = null;
             BackwardComputeOperation bop = null;
 
             if (requiresGradient) {
-                gradient = new double[1][this.numCols()];
+                gradient = new MatrixStorage(1, this.numCols());
                 bop = new MinBackwardByAxisOperation(this, axis, this.backwardComputeOperation);
             }
 
             return new Matrix(value, gradient, requiresGradient, fop, bop);
         } else {
-            double[][] value = new double[this.numRows()][1];
+            MatrixStorage value = new MatrixStorage(this.numRows(), 1);
             ForwardComputeOperation fop = new MinForwardByAxisOperation(this, axis, this.forwardComputeOperation);
 
-            double[][] gradient = null;
+            MatrixStorage gradient = null;
             BackwardComputeOperation bop = null;
 
             if (requiresGradient) {
-                gradient = new double[this.numRows()][1];
+                gradient = new MatrixStorage(this.numRows(), 1);
                 bop = new MinBackwardByAxisOperation(this, axis, this.backwardComputeOperation);
             }
 
@@ -335,11 +335,11 @@ public class Matrix extends AbstractMatrix {
     }
 
     public Matrix mean() {
-        return sum().div(create((double)numRows() * numCols()));
+        return sum().div(create((float)numRows() * numCols()));
     }
 
     public Matrix mean(int axis) {
-        return sum(axis).div(create((axis == 0) ? (double)numRows() : (double)numCols()));
+        return sum(axis).div(create((axis == 0) ? (float)numRows() : (float)numCols()));
     }
 
     public Matrix variance() {
@@ -502,7 +502,7 @@ public class Matrix extends AbstractMatrix {
     }
     /*Matrix specific static methods start*/
 
-    protected Matrix(double[][] value, double[][] gradient, boolean requiresGradient, ForwardComputeOperation forwardComputeOperation, BackwardComputeOperation backwardComputeOperation) {
+    protected Matrix(MatrixStorage value, MatrixStorage gradient, boolean requiresGradient, ForwardComputeOperation forwardComputeOperation, BackwardComputeOperation backwardComputeOperation) {
         super(value, gradient, requiresGradient, forwardComputeOperation, backwardComputeOperation);
         if(null!=forwardComputeOperation) {
             forwardComputeOperation.setResult(this);
@@ -521,43 +521,45 @@ public class Matrix extends AbstractMatrix {
         super(null, null, requiresGradient, forwardComputeOperation, backwardComputeOperation);
     }
 
-    public static Matrix create(double val) {
+    public static Matrix create(float val) {
         return create(val, false);
     }
 
-    public static Matrix create(double val, boolean trainable) {
+    public static Matrix create(float val, boolean trainable) {
         return create(1, 1, () -> val, trainable);
     }
 
     public static Matrix create(int rows, int columns) {
-        return create(rows, columns, () -> 0.0);
+        return create(rows, columns, () -> 0.0f);
     }
 
     public static Matrix create(int rows, int columns, boolean trainable) {
-        return create(rows, columns, () -> 0.0, trainable);
+        return create(rows, columns, () -> 0.0f, trainable);
     }
 
-    public static Matrix create(int rows, int columns, Supplier<Double> valueSupplier) {
+    public static Matrix create(int rows, int columns, Supplier<Float> valueSupplier) {
         return create(rows, columns, valueSupplier, false);
     }
 
-    public static Matrix create(int rows, int columns, Supplier<Double> valueSupplier, boolean trainable) {
+    public static Matrix create(int rows, int columns, Supplier<Float> valueSupplier, boolean trainable) {
         if (rows <= 0) {
             throw new IllegalArgumentException("A matrix cannot have 0 or less than 0 rows.");
-        } if (columns <= 0) {
+        }
+        if (columns <= 0) {
             throw new IllegalArgumentException("A matrix cannot have 0 or less than 0 columns.");
-        } double[][] value = new double[rows][columns];
+        }
+        MatrixStorage value = new MatrixStorage(rows, columns);
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                value[i][j] = valueSupplier.get();
+                value.set(i, j, valueSupplier.get());
             }
         }
-        double[][] gradient = null;
+        MatrixStorage gradient = null;
         if (trainable) {
-            gradient = new double[rows][columns];
+            gradient = new MatrixStorage(rows, columns);
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < columns; j++) {
-                    gradient[i][j] = 0;
+                    gradient.set(i, j, 0);
                 }
             }
         }
@@ -565,8 +567,8 @@ public class Matrix extends AbstractMatrix {
     }
 
     public static Matrix createXavierGlorotInitializedMatrix(int rows, int columns, boolean trainable) {
-        final double scale = Math.sqrt(6.0 / (rows + columns));
-        return create(rows, columns, () -> ((random.nextDouble() * 2 - 1) * scale), trainable);
+        final float scale = (float)Math.sqrt(6.0 / (rows + columns));
+        return create(rows, columns, () -> ((float)(random.nextDouble() * 2 - 1) * scale), trainable);
     }
 
     /*Matrix specific static methods end*/

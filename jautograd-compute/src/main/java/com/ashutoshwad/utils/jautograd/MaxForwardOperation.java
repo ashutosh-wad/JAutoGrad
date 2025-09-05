@@ -21,6 +21,6 @@ class MaxForwardOperation extends ForwardComputeOperation {
                 }
             }
         }
-        result.setValue(0, 0, max);
+        result.setValue(0, 0, (float)max);
     }
 }

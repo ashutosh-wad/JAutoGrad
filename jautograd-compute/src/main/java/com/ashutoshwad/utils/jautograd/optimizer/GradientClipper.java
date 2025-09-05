@@ -73,7 +73,7 @@ public class GradientClipper {
             for (int row = 0; row < parameters.numRows(); row++) {
                 for (int col = 0; col < parameters.numCols(); col++) {
                     double gradient = parameters.getGradient(row, col);
-                    parameters.setGradient(row, col, gradient * scale);
+                    parameters.setGradient(row, col, (float)(gradient * scale));
                 }
             }
         }

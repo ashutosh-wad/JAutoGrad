@@ -30,7 +30,7 @@ class MinForwardByAxisOperation extends ForwardComputeOperation {
                     min = Math.min(min, sourceVal);
                 }
             }
-            result.setValue(0, col, min);
+            result.setValue(0, col, (float)min);
         }
     }
 
@@ -46,7 +46,7 @@ class MinForwardByAxisOperation extends ForwardComputeOperation {
                     min = Math.min(min, sourceVal);
                 }
             }
-            result.setValue(row, 0, min);
+            result.setValue(row, 0, (float)min);
         }
     }
 }

@@ -38,7 +38,7 @@ public class MaxBackwardByAxisOperation extends BackwardComputeOperation {
 
             final double revisedGradient = gradient / counter;
             for (int[]pos:positions) {
-                source.accumulateGradient(pos[0], pos[1], revisedGradient);
+                source.accumulateGradient(pos[0], pos[1], (float)revisedGradient);
             }
         }
     }
@@ -60,7 +60,7 @@ public class MaxBackwardByAxisOperation extends BackwardComputeOperation {
 
             final double revisedGradient = gradient / counter;
             for (int[]pos:positions) {
-                source.accumulateGradient(pos[0], pos[1], revisedGradient);
+                source.accumulateGradient(pos[0], pos[1], (float)revisedGradient);
             }
         }
     }

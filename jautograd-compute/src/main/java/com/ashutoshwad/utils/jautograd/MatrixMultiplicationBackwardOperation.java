@@ -65,7 +65,7 @@ public class MatrixMultiplicationBackwardOperation extends BackwardComputeOperat
                 for (int resCol = 0; resCol < result.numCols(); resCol++) {
                     temp += result.getGradient(lRow, resCol) * right.getValue(lCol, resCol);
                 }
-                left.accumulateGradient(lRow, lCol, temp);
+                left.accumulateGradient(lRow, lCol, (float)temp);
             }
         }
     }
@@ -99,7 +99,7 @@ public class MatrixMultiplicationBackwardOperation extends BackwardComputeOperat
                 for (int resRow = 0; resRow < result.numRows(); resRow++) {
                     temp += result.getGradient(resRow, rCol) * left.getValue(resRow, rRow);
                 }
-                right.accumulateGradient(rRow, rCol, temp);
+                right.accumulateGradient(rRow, rCol, (float)temp);
             }
         }
     }

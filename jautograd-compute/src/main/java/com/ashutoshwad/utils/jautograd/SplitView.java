@@ -31,19 +31,19 @@ public class SplitView extends Matrix {
     }
 
     //Override accessors
-    public double getValue(int row, int column) {
+    public float getValue(int row, int column) {
         return original.getValue(mapRow(row), mapCol(column));
     }
-    public synchronized void setValue(int row, int column, double value) {
+    public synchronized void setValue(int row, int column, float value) {
         original.setValue(mapRow(row), mapCol(column), value);
     }
-    public double getGradient(int row, int column) {
+    public float getGradient(int row, int column) {
         return original.getGradient(mapRow(row), mapCol(column));
     }
-    public synchronized void setGradient(int row, int column, double value) {
+    public synchronized void setGradient(int row, int column, float value) {
         original.setGradient(mapRow(row), mapCol(column), value);
     }
-    public synchronized void accumulateGradient(int row, int column, double value) {
+    public synchronized void accumulateGradient(int row, int column, float value) {
         original.accumulateGradient(mapRow(row), mapCol(column), value);
     }
     public int numRows() {

@@ -51,7 +51,7 @@ class ElementWiseUnaryForwardOperation extends ForwardComputeOperation {
                 int row = i / numCols;
                 int column = i % numCols;
                 double inputValue = input.getValue(row, column);
-                result.setValue(row, column, forwardFunction.result(inputValue));
+                result.setValue(row, column, (float)forwardFunction.result(inputValue));
             }
         }
     }

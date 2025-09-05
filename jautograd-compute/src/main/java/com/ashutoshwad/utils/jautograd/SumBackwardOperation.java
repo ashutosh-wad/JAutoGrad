@@ -13,7 +13,7 @@ class SumBackwardOperation extends BackwardComputeOperation {
         final double resultGradient = getResult().getGradient();
         for (int row = 0; row < source.numRows(); row++) {
             for (int col = 0; col < source.numCols(); col++) {
-                source.accumulateGradient(row, col, resultGradient);
+                source.accumulateGradient(row, col, (float)resultGradient);
             }
         }
     }

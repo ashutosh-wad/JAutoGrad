@@ -53,7 +53,7 @@ public class StocasticGradientDescentOptimizer {
         public void run() {
             for (int row = 0; row < parameters.numRows(); row++) {
                 for (int col = 0; col < parameters.numCols(); col++) {
-                    parameters.setValue(row, col, parameters.getValue(row, col) - (learningRate * parameters.getGradient(row, col)));
+                    parameters.setValue(row, col, (float)(parameters.getValue(row, col) - (learningRate * parameters.getGradient(row, col))));
                 }
             }
         }

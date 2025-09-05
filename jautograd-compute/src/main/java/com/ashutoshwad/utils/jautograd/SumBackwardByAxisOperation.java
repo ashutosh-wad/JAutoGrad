@@ -23,7 +23,7 @@ public class SumBackwardByAxisOperation extends BackwardComputeOperation {
         for (int col = 0; col < result.numCols(); col++) {
             double gradient = result.getGradient(0, col);
             for (int row = 0; row < source.numRows(); row++) {
-                source.accumulateGradient(row, col, gradient);
+                source.accumulateGradient(row, col, (float)gradient);
             }
         }
     }
@@ -33,7 +33,7 @@ public class SumBackwardByAxisOperation extends BackwardComputeOperation {
         for (int row = 0; row < result.numRows(); row++) {
             double gradient = result.getGradient(row, 0);
             for (int col = 0; col < source.numCols(); col++) {
-                source.accumulateGradient(row, col, gradient);
+                source.accumulateGradient(row, col, (float)gradient);
             }
         }
     }

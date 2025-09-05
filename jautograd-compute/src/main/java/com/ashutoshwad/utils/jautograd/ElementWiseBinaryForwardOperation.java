@@ -55,7 +55,7 @@ class ElementWiseBinaryForwardOperation extends ForwardComputeOperation {
                 int column = i % numCols;
                 double leftValue = left.getValue(row, column);
                 double rightValue = right.getValue(row, column);
-                result.setValue(row, column, forwardFunction.result(leftValue, rightValue));
+                result.setValue(row, column, (float)forwardFunction.result(leftValue, rightValue));
             }
         }
     }

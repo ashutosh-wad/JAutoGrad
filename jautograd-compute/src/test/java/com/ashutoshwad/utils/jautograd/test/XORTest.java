@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class XORTest {
-    private static final double LEARNING_RATE = 0.01;
+    private static final float LEARNING_RATE = 0.01f;
     private Matrix input;
     private Matrix target;
     private Matrix hiddenWeights;
@@ -29,9 +29,9 @@ public class XORTest {
 
         // Initialize network parameters
         this.hiddenWeights = Matrix.createXavierGlorotInitializedMatrix(2, 8, true);
-        this.hiddenBias = Matrix.create(1, 8, () -> 0.0, true);
+        this.hiddenBias = Matrix.create(1, 8, () -> 0.0f, true);
         this.outputWeights = Matrix.createXavierGlorotInitializedMatrix(8, 1, true);
-        this.outputBias = Matrix.create(1, 1, () -> 0.0, true);
+        this.outputBias = Matrix.create(1, 1, () -> 0.0f, true);
 
         // Setup optimizer and gradient clipper
         this.optimizer = new AdamWOptimizer(LEARNING_RATE);
@@ -134,11 +134,11 @@ public class XORTest {
     }
 
     private Matrix createXORInput() {
-        double[][] data = {
-                {0.0, 0.0},  // XOR input 1
-                {0.0, 1.0},  // XOR input 2
-                {1.0, 0.0},  // XOR input 3
-                {1.0, 1.0}   // XOR input 4
+        float[][] data = {
+                {0.0f, 0.0f},  // XOR input 1
+                {0.0f, 1.0f},  // XOR input 2
+                {1.0f, 0.0f},  // XOR input 3
+                {1.0f, 1.0f}   // XOR input 4
         };
 
         Matrix input = Matrix.create(4, 2);
@@ -157,11 +157,11 @@ public class XORTest {
     }
 
     private Matrix createXORTarget() {
-        double[][] data = {
-                {0.0},  // 0 XOR 0 = 0
-                {1.0},  // 0 XOR 1 = 1
-                {1.0},  // 1 XOR 0 = 1
-                {0.0}   // 1 XOR 1 = 0
+        float[][] data = {
+                {0.0f},  // 0 XOR 0 = 0
+                {1.0f},  // 0 XOR 1 = 1
+                {1.0f},  // 1 XOR 0 = 1
+                {0.0f}   // 1 XOR 1 = 0
         };
 
         Matrix target = Matrix.create(4, 1);

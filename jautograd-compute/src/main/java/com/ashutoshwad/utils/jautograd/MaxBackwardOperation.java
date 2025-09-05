@@ -31,7 +31,7 @@ class MaxBackwardOperation extends BackwardComputeOperation {
         final double revisedGradient = resultGradient / counter;
 
         for (int[]pos : maxPositions) {
-            source.accumulateGradient(pos[0], pos[1], revisedGradient);
+            source.accumulateGradient(pos[0], pos[1], (float)revisedGradient);
         }
     }
 }

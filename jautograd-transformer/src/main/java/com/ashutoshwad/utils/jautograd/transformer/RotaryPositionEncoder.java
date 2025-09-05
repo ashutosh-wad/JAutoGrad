@@ -52,7 +52,7 @@ public class RotaryPositionEncoder {
         Matrix sinMatrix = Matrix.create(numRows, numCols);
         for (int row = 0; row < sinMatrix.numRows(); row++) {
             for (int col = 0; col < sinMatrix.numCols(); col++) {
-                sinMatrix.setValue(row, col, Math.sin(calculateTheta(col, row, numCols)));
+                sinMatrix.setValue(row, col, (float)Math.sin(calculateTheta(col, row, numCols)));
             }
         }
         return sinMatrix;
@@ -62,7 +62,7 @@ public class RotaryPositionEncoder {
         Matrix cosMatrix = Matrix.create(numRows, numCols);
         for (int row = 0; row < cosMatrix.numRows(); row++) {
             for (int col = 0; col < cosMatrix.numCols(); col++) {
-                cosMatrix.setValue(row, col, Math.cos(calculateTheta(col, row, numCols)));
+                cosMatrix.setValue(row, col, (float)Math.cos(calculateTheta(col, row, numCols)));
             }
         }
         return cosMatrix;
