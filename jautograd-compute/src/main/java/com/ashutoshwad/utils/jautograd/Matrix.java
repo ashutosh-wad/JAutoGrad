@@ -384,6 +384,27 @@ public class Matrix extends AbstractMatrix {
         return sub(mean(axis)).div(variance(axis).add(create(EPSILON)).sqrt());
     }
 
+    /* Adding RoPE as a first class operation to prevent an unnecessary number of matrix operations */
+    public Matrix rotaryPositionEncoding() {
+        int dk = numCols();
+        if(dk % 2 != 0) {
+            throw new IllegalArgumentException("RoPE can only be applied to matrices with an even number of columns!");
+        }
+
+        MatrixStorage value = new MatrixStorage(this.numRows(), this.numCols());
+        MatrixStorage gradient = null;
+        if (requiresGradient) {
+            gradient = new MatrixStorage(this.numRows(), this.numCols());
+        }
+        RotaryPositionEncoderNode.ForwardPass forwardPass = new RotaryPositionEncoderNode.ForwardPass(this, this.forwardComputeOperation);
+        RotaryPositionEncoderNode.BackwardPass backwardPass = null;
+        if (requiresGradient) {
+            backwardPass = new RotaryPositionEncoderNode.BackwardPass(this, this.backwardComputeOperation);
+        }
+
+        return new Matrix(value, gradient, requiresGradient, forwardPass, backwardPass);
+    }
+
     /* Matrix training dropout methods start here */
     public Matrix dropout() {
         return dropout(0.5);
