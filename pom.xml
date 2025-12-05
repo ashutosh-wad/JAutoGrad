@@ -9,5 +9,6 @@
   <modules>
     <module>jautograd-compute</module>
     <module>jautograd-transformer</module>
+    <module>jautograd-core</module>
   </modules>
 </project>
