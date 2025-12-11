@@ -99,7 +99,6 @@ public class Matrix extends ComputeNode {
     }
     public Matrix matmul(ComputeNode other) {
         return new MultiplicationOperator(this, other, "MATMUL");
-        //return new MultiplicationOperatorTransposeOptimizedMultiThread(this, other, "MATMULOPT");
     }
 
     /* Override mandatory methods */
